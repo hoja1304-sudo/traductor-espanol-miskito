@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Traductor Español – Miskito</title>
+<meta name="description" content="Aplicación para escuchar español y traducirlo al miskito de Nicaragua, con frases, diccionario y traducción libre con inteligencia artificial.">
+<style>
+:root{
+  --bg:#f3f8f7; --panel:#ffffff; --ink:#17323a; --muted:#56707a; --line:#d4e4e2;
+  --mar:#0f7c8c; --mar-2:#0b5f6c; --sol:#e0a21b; --coral:#c4502a; --verde:#23874f; --morado:#7d4cc4; --azul:#2f62d9;
+  --chip-ok:#e3f4ea; --chip-ok-ink:#1d6b40; --chip-warn:#fdf1d8; --chip-warn-ink:#8a5a00; --chip-ia:#ece4fa; --chip-ia-ink:#5b3699;
+  --miskito-bg:#e6f4f5; --sombra:0 6px 18px rgba(15,60,70,.10);
+}
+[data-theme="dark"]{
+  --bg:#0f1b1f; --panel:#172a30; --ink:#e7f2f1; --muted:#9db6bb; --line:#2b444b;
+  --mar:#138b9c; --mar-2:#0f7381; --sol:#d9951a; --coral:#c4502a; --verde:#23874f; --morado:#7d4cc4; --azul:#2f62d9;
+  --chip-ok:#173f2a; --chip-ok-ink:#9fe0b8; --chip-warn:#41320f; --chip-warn-ink:#f3cf7e; --chip-ia:#2e2346; --chip-ia-ink:#cdb6f5;
+  --miskito-bg:#13353b; --sombra:0 6px 18px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:"Segoe UI",Arial,Helvetica,sans-serif;font-size:17px;line-height:1.5;min-height:100vh}
+button,input,textarea,select{font:inherit;color:inherit}
+.oculto{display:none!important}
+
+/* Barra fija */
+.barra{position:fixed;top:10px;right:12px;display:flex;gap:8px;z-index:50}
+.redondo{width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:var(--panel);box-shadow:var(--sombra);font-size:22px;cursor:pointer;display:grid;place-items:center}
+.redondo:focus-visible,.pill:focus-visible,.tarjeta-inicio:focus-visible{outline:3px solid var(--sol);outline-offset:2px}
+
+/* Botones píldora */
+.pill{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:10px 20px;border-radius:999px;border:none;cursor:pointer;font-weight:600;color:#fff;background:var(--mar);width:auto}
+.pill.sec{background:transparent;color:var(--ink);border:2px solid var(--line)}
+.pill.coral{background:var(--coral)} .pill.verde{background:var(--verde)} .pill.morado{background:var(--morado)} .pill.azul{background:var(--azul)}
+.pill.chico{min-height:44px;padding:8px 14px;font-size:15px}
+.pill:disabled{opacity:.55;cursor:not-allowed}
+.pill.grabando{background:#b3261e;animation:latido 1s infinite}
+@keyframes latido{50%{transform:scale(1.05)}}
+
+.contenedor{max-width:900px;margin:0 auto;padding:72px 16px 40px}
+.cabeza-seccion{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:14px}
+.cabeza-seccion h2{margin:0;font-size:1.5rem;flex:1 1 220px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:var(--sombra);margin-bottom:16px}
+
+/* Inicio */
+.portada{text-align:center;padding-top:20px}
+.olas{width:100%;max-width:520px;height:auto;margin:0 auto 6px;display:block}
+.portada h1{font-size:clamp(1.7rem,5vw,2.5rem);margin:6px 0 4px;color:var(--mar)}
+.portada .sub{color:var(--muted);margin:0 0 18px}
+.autoria{font-size:.92rem;color:var(--muted);margin:22px auto 0;max-width:620px}
+.rejilla{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-top:10px}
+.tarjeta-inicio{border:none;border-radius:20px;padding:22px 16px;color:#fff;cursor:pointer;text-align:left;min-height:120px;box-shadow:var(--sombra);display:flex;flex-direction:column;gap:6px}
+.tarjeta-inicio .ico{font-size:32px}
+.tarjeta-inicio b{font-size:1.2rem}
+.tarjeta-inicio span{font-size:.92rem;opacity:.95}
+.aviso{background:var(--chip-warn);color:var(--chip-warn-ink);border-radius:14px;padding:12px 16px;margin-top:18px;text-align:left;font-size:.95rem}
+
+/* Traducir */
+textarea{width:100%;min-height:110px;border-radius:14px;border:2px solid var(--line);background:var(--bg);padding:12px;font-size:1.1rem;resize:vertical}
+.fila{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:12px}
+.estado{color:var(--muted);font-size:.95rem;min-height:1.5em;margin-top:8px}
+.resultado{background:var(--miskito-bg);border-radius:18px;padding:18px;margin-top:6px}
+.resultado .etq{font-size:.85rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0}
+.miskito-grande{font-size:clamp(1.5rem,4.5vw,2.2rem);font-weight:700;color:var(--mar);margin:4px 0 10px;word-wrap:break-word}
+[data-theme="dark"] .miskito-grande{color:#7fd8e3}
+.retro{font-size:1rem;margin:4px 0}
+.chip{display:inline-block;border-radius:999px;padding:3px 12px;font-size:.82rem;font-weight:600}
+.chip.ok{background:var(--chip-ok);color:var(--chip-ok-ink)}
+.chip.warn{background:var(--chip-warn);color:var(--chip-warn-ink)}
+.chip.ia{background:var(--chip-ia);color:var(--chip-ia-ink)}
+.palabras{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.palabra{border:1px solid var(--line);border-radius:12px;padding:6px 10px;background:var(--panel);font-size:.95rem}
+.palabra b{color:var(--mar)}
+.palabra.falta{opacity:.6;border-style:dashed}
+
+/* Frases */
+.pestanas{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.pestanas .pill{background:transparent;color:var(--ink);border:2px solid var(--line)}
+.pestanas .pill.activa{background:var(--mar);color:#fff;border-color:var(--mar)}
+.lista-frases{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.frase{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:6px}
+.frase .es{font-size:1rem;color:var(--muted)}
+.frase .mi{font-size:1.35rem;font-weight:700;color:var(--mar)}
+[data-theme="dark"] .frase .mi{color:#7fd8e3}
+.frase .mi.vacia{font-weight:400;font-style:italic;font-size:1rem;color:var(--muted)}
+.frase .acciones{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.frase .acciones .pill{min-height:44px;padding:6px 12px;font-size:14px}
+.editor{display:flex;gap:6px;flex-wrap:wrap}
+.editor input{flex:1 1 150px;min-height:44px;border-radius:12px;border:2px solid var(--line);background:var(--bg);padding:6px 10px}
+
+/* Diccionario */
+.buscador{width:100%;min-height:50px;border-radius:999px;border:2px solid var(--line);background:var(--panel);padding:10px 18px;font-size:1.05rem}
+table{width:100%;border-collapse:collapse;margin-top:12px}
+th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line)}
+th{font-size:.85rem;text-transform:uppercase;color:var(--muted)}
+td.mi{font-weight:700;color:var(--mar)}
+[data-theme="dark"] td.mi{color:#7fd8e3}
+td .pill{min-height:44px;padding:4px 12px}
+
+/* Ajustes */
+label{display:block;font-weight:600;margin:10px 0 4px}
+.campo{width:100%;min-height:48px;border-radius:12px;border:2px solid var(--line);background:var(--bg);padding:8px 12px}
+.fuentes li{margin-bottom:8px}
+.fuentes a{color:var(--mar)}
+[data-theme="dark"] .fuentes a{color:#7fd8e3}
+.nota{font-size:.92rem;color:var(--muted)}
+
+/* Impresión */
+#zonaImpresion{display:none}
+@media print{
+  body{background:#fff;color:#000;font-family:Arial,Helvetica,sans-serif;font-size:12pt}
+  body > *:not(#zonaImpresion){display:none!important}
+  #zonaImpresion{display:block!important;font-family:Arial,Helvetica,sans-serif;font-size:12pt;color:#000}
+  #zonaImpresion h1{font-size:16pt;margin:0 0 6pt}
+  #zonaImpresion p{margin:0 0 6pt}
+  #zonaImpresion .linea{border-bottom:1px solid #999;padding:4pt 0}
+}
+@media (max-width:520px){
+  body{font-size:16px}
+  .contenedor{padding-top:68px}
+  .barra{top:8px;right:8px;gap:6px}
+  .redondo{width:44px;height:44px;font-size:20px}
+}
+</style>
+</head>
+<body>
+
+<div class="barra" role="toolbar" aria-label="Controles">
+  <button class="redondo" id="btnAudio" title="Activar o silenciar el audio" aria-label="Audio activado">🔊</button>
+  <button class="redondo" id="btnTema" title="Cambiar a modo oscuro" aria-label="Cambiar a modo oscuro">🌙</button>
+</div>
+
+<!-- ============ INICIO ============ -->
+<main id="inicio" class="contenedor seccion portada">
+  <svg class="olas" viewBox="0 0 520 120" aria-hidden="true">
+    <circle cx="420" cy="42" r="26" fill="#e0a21b"/>
+    <path d="M0 78 Q65 58 130 78 T260 78 T390 78 T520 78 V120 H0Z" fill="#0f7c8c"/>
+    <path d="M0 92 Q65 74 130 92 T260 92 T390 92 T520 92 V120 H0Z" fill="#0b5f6c"/>
+    <path d="M150 74 L230 74 L218 86 L162 86 Z" fill="#c4502a"/>
+    <line x1="190" y1="74" x2="190" y2="40" stroke="#56707a" stroke-width="3"/>
+    <path d="M192 42 L222 68 L192 68 Z" fill="#fff" stroke="#56707a" stroke-width="1.5"/>
+  </svg>
+  <h1>Traductor Español – Miskito</h1>
+  <p class="sub">Escuchar en español, entender en miskito · Variante de Nicaragua</p>
+
+  <div class="rejilla">
+    <button class="tarjeta-inicio" style="background:#0f7c8c" data-ir="traducir"><span class="ico">🎙️</span><b>Traducir</b><span>Habla o escribe en español y escucha la traducción.</span></button>
+    <button class="tarjeta-inicio" style="background:#c4502a" data-ir="frases"><span class="ico">💬</span><b>Frases</b><span>Frases de todos los días, con voz grabada.</span></button>
+    <button class="tarjeta-inicio" style="background:#23874f" data-ir="diccionario"><span class="ico">📖</span><b>Diccionario</b><span>Busca palabras en español o en miskito.</span></button>
+    <button class="tarjeta-inicio" style="background:#7d4cc4" data-ir="ajustes"><span class="ico">⚙️</span><b>Ajustes y fuentes</b><span>Inteligencia artificial y de dónde vienen las palabras.</span></button>
+  </div>
+
+  <div class="aviso">⚠️ <b>Versión de prueba.</b> Las traducciones deben revisarlas una persona que hable miskito. Las marcadas como <i>por verificar</i> o <i>IA aproximada</i> pueden tener errores.</div>
+
+  <p class="autoria">Elaborado por: Alberto Jiménez Ruiz — Asesor Regional de Matemática · DAP-DRE-Cartago 2026</p>
+</main>
+
+<!-- ============ TRADUCIR ============ -->
+<main id="traducir" class="contenedor seccion oculto">
+  <div class="cabeza-seccion">
+    <button class="pill sec" data-ir="inicio">🏠 Inicio</button>
+    <h2>🎙️ Traducir</h2>
+    <button class="pill sec chico" data-instr="traducir">🔊 Escuchar instrucciones</button>
+  </div>
+
+  <div class="panel">
+    <label for="txtEs">Texto en español</label>
+    <textarea id="txtEs" placeholder="Toca «Hablar» y di una frase, o escríbela aquí…"></textarea>
+    <div class="fila">
+      <button class="pill coral" id="btnHablar">🎙️ Hablar</button>
+      <button class="pill" id="btnTraducir">➜ Traducir al miskito</button>
+      <button class="pill sec chico" id="btnLimpiar">Borrar</button>
+    </div>
+    <div class="estado" id="estado" aria-live="polite"></div>
+  </div>
+
+  <div class="panel oculto" id="panelResultado">
+    <div class="resultado">
+      <p class="etq">Miskito</p>
+      <div class="miskito-grande" id="resMiskito"></div>
+      <div class="fila" style="margin-top:0">
+        <button class="pill" id="btnEscucharMi">🔊 Escuchar en miskito</button>
+        <span id="resChip"></span>
+      </div>
+      <p class="retro" id="resRetro"></p>
+      <p class="nota" id="resNota"></p>
+      <div class="palabras" id="resPalabras"></div>
+    </div>
+    <div class="fila">
+      <button class="pill sec chico" id="btnGuardarFrase">⭐ Guardar en «Mis frases»</button>
+      <button class="pill sec chico" data-imprimir="traducir">🖨️ Imprimir</button>
+      <button class="pill sec chico" data-pdf="traducir">⬇️ Descargar PDF</button>
+    </div>
+  </div>
+</main>
+
+<!-- ============ FRASES ============ -->
+<main id="frases" class="contenedor seccion oculto">
+  <div class="cabeza-seccion">
+    <button class="pill sec" data-ir="inicio">🏠 Inicio</button>
+    <h2>💬 Frases</h2>
+    <button class="pill sec chico" data-instr="frases">🔊 Escuchar instrucciones</button>
+  </div>
+  <div class="pestanas" id="pestanasFrases"></div>
+  <p class="nota" id="notaCategoria"></p>
+  <div class="lista-frases" id="listaFrases"></div>
+  <div class="fila">
+    <button class="pill sec chico" data-imprimir="frases">🖨️ Imprimir</button>
+    <button class="pill sec chico" data-pdf="frases">⬇️ Descargar PDF</button>
+  </div>
+</main>
+
+<!-- ============ DICCIONARIO ============ -->
+<main id="diccionario" class="contenedor seccion oculto">
+  <div class="cabeza-seccion">
+    <button class="pill sec" data-ir="inicio">🏠 Inicio</button>
+    <h2>📖 Diccionario</h2>
+  </div>
+  <input class="buscador" id="buscar" type="search" placeholder="Buscar en español o en miskito…" aria-label="Buscar palabra">
+  <div class="panel" style="margin-top:12px;overflow-x:auto">
+    <table>
+      <thead><tr><th>Español</th><th>Miskito</th><th></th></tr></thead>
+      <tbody id="tablaDic"></tbody>
+    </table>
+  </div>
+  <div class="fila">
+    <button class="pill sec chico" data-imprimir="diccionario">🖨️ Imprimir</button>
+    <button class="pill sec chico" data-pdf="diccionario">⬇️ Descargar PDF</button>
+  </div>
+</main>
+
+<!-- ============ AJUSTES ============ -->
+<main id="ajustes" class="contenedor seccion oculto">
+  <div class="cabeza-seccion">
+    <button class="pill sec" data-ir="inicio">🏠 Inicio</button>
+    <h2>⚙️ Ajustes y fuentes</h2>
+  </div>
+
+  <div class="panel">
+    <h3 style="margin-top:0">Traducción libre con inteligencia artificial</h3>
+    <p>Cuando la frase no está en el banco de frases, la app puede pedir una traducción a Claude (Anthropic). Para eso hace falta una <b>clave de API</b> propia, que se guarda solo en este equipo.</p>
+    <label for="clave">Clave de API de Anthropic</label>
+    <input class="campo" id="clave" type="password" autocomplete="off" placeholder="sk-ant-…">
+    <div class="fila">
+      <button class="pill verde" id="btnGuardarClave">Guardar clave</button>
+      <button class="pill sec chico" id="btnBorrarClave">Quitar clave</button>
+    </div>
+    <p class="estado" id="estadoClave"></p>
+    <p class="nota">Sin clave, la app igual funciona con el banco de frases y el diccionario (palabra por palabra). La clave se consigue en console.anthropic.com. No compartas el enlace con la clave ya puesta en un equipo público.</p>
+  </div>
+
+  <div class="panel">
+    <h3 style="margin-top:0">Sobre la voz en miskito</h3>
+    <p>No existe una voz de computadora en miskito. La app hace esto:</p>
+    <ol>
+      <li>Si la frase tiene una <b>grabación</b> hecha por una persona miskita (botón 🎙️ en «Frases»), reproduce esa grabación.</li>
+      <li>Si no, lee el texto miskito con una <b>voz en español</b>. Se entiende, pero con acento: es una pronunciación aproximada.</li>
+    </ol>
+    <p class="nota">Las grabaciones y correcciones se guardan en este equipo.</p>
+    <div class="fila">
+      <button class="pill sec chico" id="btnExportar">⬇️ Exportar correcciones</button>
+      <button class="pill sec chico" id="btnImportar">⬆️ Importar correcciones</button>
+      <input type="file" id="archivoImportar" accept="application/json" class="oculto">
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3 style="margin-top:0">Fuentes del vocabulario</h3>
+    <p>El miskito es la lengua indígena más hablada de Nicaragua (Costa Caribe Norte, río Coco / Wangki, Bilwi). Su ortografía usa tres vocales básicas (<b>a, i, u</b>) y vocales largas (<b>â, î, û</b>), y todavía varía entre autores.</p>
+    <ul class="fuentes">
+      <li><b>Heath, G. R. y Marx, W. G.</b> <i>Diccionario Miskito-Español, Español-Miskito</i> (1961; 3.ª ed. 1983). El diccionario bilingüe de referencia. <a href="https://glottolog.org/resource/reference/id/59872" target="_blank" rel="noopener">Ficha en Glottolog</a></li>
+      <li><b>Vaughan Warman, A.</b> <i>Diccionario trilingüe miskito-español-inglés</i>, Managua (1959). Hecho por un hablante nativo nicaragüense.</li>
+      <li><b>Melgara, D.</b> Diccionario español-miskito / miskito-español, reseñado en la revista <i>WANI</i> (CIDCA-UCA, Nicaragua). <a href="https://camjol.info/index.php/WANI/article/view/881" target="_blank" rel="noopener">Artículo en WANI</a></li>
+      <li><b>Salamanca, D.</b> (CIDCA / BICU). Estudios sobre los verbos miskitos. <a href="https://camjol.info/index.php/WANI/article/view/19469" target="_blank" rel="noopener">«Verbos miskitos», WANI</a></li>
+      <li><b>Wikibooks:</b> curso «Miskitu Aisas!» y su léxico preliminar. <a href="https://en.wikibooks.org/wiki/Miskito/Lexicon" target="_blank" rel="noopener">Léxico</a></li>
+      <li><b>Wikipedia:</b> «Miskito grammar» (saludos, pronombres, números y verbos). <a href="https://en.wikipedia.org/wiki/Miskito_grammar" target="_blank" rel="noopener">Artículo</a></li>
+      <li><b>AILLA</b> (Universidad de Texas): colección de audio y narraciones en miskito de N. Bermúdez y W. L. Waldan Peter.</li>
+    </ul>
+    <p class="nota">Etiquetas: <span class="chip ok">Fuente</span> = tomada de las fuentes anteriores · <span class="chip warn">Por verificar</span> = propuesta, falta revisión de un hablante · <span class="chip ia">IA aproximada</span> = traducción automática · <span class="chip ok">Revisada</span> = corregida en este equipo.</p>
+  </div>
+</main>
+
+<div id="zonaImpresion"></div>
+
+<script>
+(function(){
+'use strict';
+
+/* ---------- Almacenamiento seguro ---------- */
+function leer(k, def){ try{ var v = localStorage.getItem(k); return v === null ? def : JSON.parse(v); }catch(e){ return def; } }
+function guardar(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+
+/* ---------- Datos: vocabulario (fuente: Wikipedia, Wikibooks) ---------- */
+// [español, miskito, estado]  estado: 'f' fuente, 'v' por verificar
+var CATEGORIAS = [
+  {id:'saludos', nombre:'Saludos', ico:'👋', frases:[
+    ['Hola','Naksa','f'],
+    ['Buenos días','Titan yamni','f'],
+    ['Buenas tardes','Tutni yamni','f'],
+    ['Buenas noches','Saiwan yamni','f'],
+    ['Mucho gusto','Uba lilia','f'],
+    ['Me llamo…','Yang nini…','f'],
+    ['¿De dónde eres?','Man ani wina?','f'],
+    ['Sí','Au','f'],
+    ['No','Apia','f'],
+    ['Gracias','Tingki','v'],
+    ['Muchas gracias','Tingki pali','v'],
+    ['¿Cómo estás?','Nahki sma?','v'],
+    ['Estoy bien','Yang pain sna','v']
+  ]},
+  {id:'escuela', nombre:'Escuela', ico:'🏫', frases:[
+    ['Escuela','Skul','f'],
+    ['Libro','Buk','f'],
+    ['Mesa','Tibil','f'],
+    ['Silla','Iwaika','f'],
+    ['Puerta','Dur','f'],
+    ['Ventana','Windar','f'],
+    ['Aprender','Lan takaia','f'],
+    ['Enseñar','Lan daukaia','f'],
+    ['Leer','Aisi kaikaia','f'],
+    ['Escribir','Ulbaia','f'],
+    ['Hablar','Aisaia','f'],
+    ['Escuchar / oír','Walaia','f'],
+    ['Ver','Kaikaia','f'],
+    ['Jugar','Pulaia','f'],
+    ['Ayuda','Hilp','f'],
+    ['Saber','Nu','f'],
+    ['Trabajo','Wark','f']
+  ]},
+  {id:'clase', nombre:'Frases de clase', ico:'✏️', nota:'Estas frases aún no tienen traducción revisada. Toca «✨ Sugerir con IA» o «✏️ Corregir» para escribirla, y «🎙️ Grabar» para que una persona miskita la diga.', frases:[
+    ['¿Necesitas ir al baño?','',''],
+    ['¿Tienes hambre?','',''],
+    ['¿Tienes sed?','',''],
+    ['Abre tu cuaderno','',''],
+    ['Siéntate, por favor','',''],
+    ['Escucha con atención','',''],
+    ['Muy bien, ¡excelente trabajo!','',''],
+    ['¿Entendiste?','',''],
+    ['Levanta la mano','',''],
+    ['Es hora de comer','',''],
+    ['Vamos al recreo','',''],
+    ['¿Te sientes bien?','',''],
+    ['Tu mamá viene por ti','',''],
+    ['Mañana nos vemos','','']
+  ]},
+  {id:'familia', nombre:'Familia y personas', ico:'👪', frases:[
+    ['Mamá','Yapti','f'],
+    ['Papá','Aisa','f'],
+    ['Abuela','Kuka','f'],
+    ['Abuelo','Dama','f'],
+    ['Nieto / nieta','Mula','f'],
+    ['Niño / niña','Tuktan','f'],
+    ['Mujer','Mairin','f'],
+    ['Persona / gente','Upla','f'],
+    ['Yo','Yang','f'],
+    ['Tú','Man','f'],
+    ['Él / ella','Witin','f'],
+    ['Nosotros (todos)','Yawan','f']
+  ]},
+  {id:'casa', nombre:'Casa y comida', ico:'🏠', frases:[
+    ['Casa','Utla','f'],
+    ['Cama','Krikri','f'],
+    ['Hamaca','Silmika','f'],
+    ['Agua','Li','f'],
+    ['Comida','Plun','f'],
+    ['Carne','Wina','f'],
+    ['Pan','Brid','f'],
+    ['Huevo','Mahbra','f'],
+    ['Fruta','Ma','f'],
+    ['Plátano','Platu','f'],
+    ['Mango','Mangu','f'],
+    ['Aguacate','Sikia','f'],
+    ['Papaya','Twas','f'],
+    ['Pescado','Inska','f'],
+    ['Comer','Piaia','f'],
+    ['Beber','Diaia','f'],
+    ['Dormir','Yapaia','f'],
+    ['Dinero','Lalahka','f']
+  ]},
+  {id:'animales', nombre:'Animales y naturaleza', ico:'🐢', frases:[
+    ['Animal','Daiwan','f'],
+    ['Perro','Yul','f'],
+    ['Gato','Pus','f'],
+    ['Caballo','Aras','f'],
+    ['Vaca','Bip','f'],
+    ['Cerdo','Kuirku','f'],
+    ['Gallina','Kalila','f'],
+    ['Venado','Sula','f'],
+    ['Conejo','Tibang','f'],
+    ['Tortuga de mar','Lih','f'],
+    ['Serpiente','Pyuta','f'],
+    ['Mariposa','Dildil','f'],
+    ['Mar','Kabu','f'],
+    ['Bote','Duri','f']
+  ]},
+  {id:'cuerpo', nombre:'Cuerpo', ico:'🧍', frases:[
+    ['Cabeza','Lal','f'],
+    ['Cara','Mawan','f'],
+    ['Ojo','Nakra','f'],
+    ['Oreja','Kyama','f'],
+    ['Nariz','Kakma','f'],
+    ['Boca','Bila','f'],
+    ['Diente','Napa','f'],
+    ['Lengua','Twisa','f'],
+    ['Mano','Mihta','f'],
+    ['Pie','Mina','f'],
+    ['Pelo','Tawa','f'],
+    ['Corazón','Kupia','f'],
+    ['Estómago','Klunghka','f']
+  ]},
+  {id:'numeros', nombre:'Números y palabras útiles', ico:'🔢', frases:[
+    ['Uno','Kumi','f'],
+    ['Dos','Wal','f'],
+    ['Tres','Yumhpa','f'],
+    ['Cuatro','Walhwal','f'],
+    ['Cinco','Matsip','f'],
+    ['Grande','Tara','f'],
+    ['Pequeño','Sirpi','f'],
+    ['Blanco','Pihni','f'],
+    ['Negro','Siksa','f'],
+    ['Fuerte','Karna','f'],
+    ['Todos','Sut','f'],
+    ['Aquí','Naura','f'],
+    ['Ahora','Mahka','f'],
+    ['¿Qué?','Dia?','f'],
+    ['¿Quién?','Ya?','f'],
+    ['¿Dónde?','Anira?','f'],
+    ['¿Cómo?','Nahki?','f'],
+    ['¿Cuándo?','Ahkia?','f'],
+    ['¿Por qué?','Diakan?','f'],
+    ['Venir','Balaia','f'],
+    ['Ir','Waia','f'],
+    ['Dar','Yabaia','f'],
+    ['Querer','Want','f']
+  ]}
+];
+
+/* Mis frases (guardadas desde Traducir) y correcciones locales */
+var correcciones = leer('mq_correcciones', {});   // id -> {mi, estado}
+var misFrases = leer('mq_misfrases', []);         // [{es, mi, estado}]
+
+function idFrase(es){ return normal(es).replace(/\s+/g,'_'); }
+function normal(t){
+  return (t||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')
+    .replace(/[¿?¡!.,;:()«»"“”…]/g,' ').replace(/\s+/g,' ').trim();
+}
+
+function todasLasFrases(){
+  var lista = [];
+  CATEGORIAS.forEach(function(c){
+    c.frases.forEach(function(f){
+      var id = idFrase(f[0]), cor = correcciones[id];
+      lista.push({id:id, es:f[0], mi: cor ? cor.mi : f[1], estado: cor ? cor.estado : f[2], cat:c.id});
+    });
+  });
+  misFrases.forEach(function(f){
+    var id = idFrase(f.es), cor = correcciones[id];
+    lista.push({id:id, es:f.es, mi: cor ? cor.mi : f.mi, estado: cor ? cor.estado : f.estado, cat:'mias'});
+  });
+  return lista;
+}
+
+/* ---------- Tema ---------- */
+var btnTema = document.getElementById('btnTema');
+function aplicarTema(t){
+  document.documentElement.setAttribute('data-theme', t);
+  var oscuro = t === 'dark';
+  btnTema.textContent = oscuro ? '☀️' : '🌙';
+  btnTema.title = oscuro ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro';
+  btnTema.setAttribute('aria-label', btnTema.title);
+}
+aplicarTema(leer('mq_tema', 'light'));
+btnTema.addEventListener('click', function(){
+  var t = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  aplicarTema(t); guardar('mq_tema', t);
+});
+
+/* ---------- Audio ---------- */
+var audioOn = leer('mq_audio', true);
+var btnAudio = document.getElementById('btnAudio');
+function pintarAudio(){
+  btnAudio.textContent = audioOn ? '🔊' : '🔇';
+  btnAudio.setAttribute('aria-label', audioOn ? 'Audio activado' : 'Audio silenciado');
+}
+pintarAudio();
+btnAudio.addEventListener('click', function(){
+  audioOn = !audioOn; guardar('mq_audio', audioOn); pintarAudio();
+  if(!audioOn) detenerTodo();
+});
+
+var sintesis = window.speechSynthesis || null;
+var vozEs = null;
+function elegirVoz(){
+  if(!sintesis) return;
+  var voces = sintesis.getVoices().filter(function(v){ return /^es([-_]|$)/i.test(v.lang); });
+  var pref = ['es-MX','es-US','es-419','es-CR','es-NI','es-CO','es-ES'];
+  vozEs = null;
+  for(var i=0;i<pref.length && !vozEs;i++){
+    vozEs = voces.find(function(v){ return v.lang.replace(/_/g,'-').toLowerCase() === pref[i].toLowerCase(); }) || null;
+  }
+  if(!vozEs && voces.length) vozEs = voces[0];
+}
+if(sintesis){ sintesis.getVoices(); elegirVoz(); sintesis.onvoiceschanged = elegirVoz; }
+
+var audioActual = null, quienHabla = null;
+function detenerTodo(){
+  if(sintesis) sintesis.cancel();
+  if(audioActual){ audioActual.pause(); audioActual = null; }
+  quienHabla = null;
+}
+// Lee texto con voz en español. Devuelve false si no hay síntesis.
+function decir(texto, clave){
+  if(!audioOn || !sintesis) return false;
+  if(quienHabla === clave){ detenerTodo(); return true; } // segundo toque detiene
+  detenerTodo();
+  var u = new SpeechSynthesisUtterance(texto);
+  if(vozEs){ u.voice = vozEs; u.lang = vozEs.lang.replace(/_/g,'-'); } else { u.lang = 'es-US'; }
+  u.rate = 0.9;
+  u.onend = function(){ if(quienHabla === clave) quienHabla = null; };
+  quienHabla = clave;
+  sintesis.speak(u);
+  return true;
+}
+// Prepara texto miskito para que una voz en español lo lea lo mejor posible
+function paraVoz(mi){
+  return mi.normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/…/g,'');
+}
+function escucharMiskito(id, texto){
+  if(!audioOn) return;
+  obtenerGrabacion(id).then(function(blob){
+    if(blob){
+      if(quienHabla === 'rec-'+id){ detenerTodo(); return; }
+      detenerTodo();
+      audioActual = new Audio(URL.createObjectURL(blob));
+      quienHabla = 'rec-'+id;
+      audioActual.onended = function(){ quienHabla = null; };
+      audioActual.play();
+    } else {
+      decir(paraVoz(texto), 'mi-'+id);
+    }
+  });
+}
+
+var INSTRUCCIONES = {
+  traducir:'Toca el botón Hablar y di una frase en español. También puedes escribirla. Luego toca Traducir al miskito y después Escuchar en miskito.',
+  frases:'Elige un grupo de frases. Toca Escuchar para oír la frase en miskito. Una persona que hable miskito puede tocar Grabar para guardar su voz, o Corregir para arreglar la traducción.'
+};
+document.querySelectorAll('[data-instr]').forEach(function(b){
+  b.addEventListener('click', function(){ decir(INSTRUCCIONES[b.dataset.instr], 'instr-'+b.dataset.instr); });
+});
+
+/* ---------- Grabaciones (IndexedDB) ---------- */
+var dbPromesa = new Promise(function(resolver){
+  try{
+    var req = indexedDB.open('traductor-miskito', 1);
+    req.onupgradeneeded = function(){ req.result.createObjectStore('grabaciones'); };
+    req.onsuccess = function(){ resolver(req.result); };
+    req.onerror = function(){ resolver(null); };
+  }catch(e){ resolver(null); }
+});
+function obtenerGrabacion(id){
+  return dbPromesa.then(function(db){
+    if(!db) return null;
+    return new Promise(function(res){
+      try{
+        var r = db.transaction('grabaciones').objectStore('grabaciones').get(id);
+        r.onsuccess = function(){ res(r.result || null); };
+        r.onerror = function(){ res(null); };
+      }catch(e){ res(null); }
+    });
+  });
+}
+function guardarGrabacion(id, blob){
+  return dbPromesa.then(function(db){
+    if(!db) return;
+    return new Promise(function(res){
+      try{
+        var tx = db.transaction('grabaciones','readwrite');
+        tx.objectStore('grabaciones').put(blob, id);
+        tx.oncomplete = res; tx.onerror = res;
+      }catch(e){ res(); }
+    });
+  });
+}
+function listarGrabadas(){
+  return dbPromesa.then(function(db){
+    if(!db) return [];
+    return new Promise(function(res){
+      try{
+        var r = db.transaction('grabaciones').objectStore('grabaciones').getAllKeys();
+        r.onsuccess = function(){ res(r.result || []); };
+        r.onerror = function(){ res([]); };
+      }catch(e){ res([]); }
+    });
+  });
+}
+
+var grabador = null;
+function alternarGrabacion(id, boton){
+  if(grabador && grabador.state === 'recording'){ grabador.stop(); return; }
+  if(!navigator.mediaDevices || !window.MediaRecorder){ alert('Este navegador no permite grabar audio.'); return; }
+  navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
+    var trozos = [];
+    grabador = new MediaRecorder(stream);
+    grabador.ondataavailable = function(e){ if(e.data.size) trozos.push(e.data); };
+    grabador.onstop = function(){
+      stream.getTracks().forEach(function(t){ t.stop(); });
+      var blob = new Blob(trozos, {type: grabador.mimeType || 'audio/webm'});
+      guardarGrabacion(id, blob).then(pintarFrases);
+    };
+    grabador.start();
+    boton.classList.add('grabando'); boton.textContent = '⏹️ Detener';
+  }).catch(function(){ alert('No se pudo usar el micrófono. Revisa el permiso del navegador.'); });
+}
+
+/* ---------- Navegación ---------- */
+var seccionActual = 'inicio';
+function ir(id){
+  detenerTodo();
+  document.querySelectorAll('.seccion').forEach(function(s){ s.classList.toggle('oculto', s.id !== id); });
+  seccionActual = id;
+  window.scrollTo(0,0);
+  if(id === 'frases') pintarFrases();
+  if(id === 'diccionario') pintarDiccionario();
+  if(id === 'ajustes') pintarClave();
+}
+document.addEventListener('click', function(e){
+  var b = e.target.closest('[data-ir]');
+  if(b) ir(b.dataset.ir);
+});
+
+/* ---------- Frases ---------- */
+var catActual = 'saludos';
+function categoriasVisibles(){
+  var cats = CATEGORIAS.slice();
+  if(misFrases.length) cats.push({id:'mias', nombre:'Mis frases', ico:'⭐'});
+  return cats;
+}
+function chipEstado(estado){
+  if(estado === 'f') return '<span class="chip ok">Fuente</span>';
+  if(estado === 'r') return '<span class="chip ok">Revisada</span>';
+  if(estado === 'ia') return '<span class="chip ia">IA aproximada</span>';
+  if(estado === 'v') return '<span class="chip warn">Por verificar</span>';
+  return '<span class="chip warn">Sin traducción</span>';
+}
+function esc(t){ return String(t).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
+function pintarFrases(){
+  var pest = document.getElementById('pestanasFrases');
+  pest.innerHTML = categoriasVisibles().map(function(c){
+    return '<button class="pill chico'+(c.id===catActual?' activa':'')+'" data-cat="'+c.id+'">'+c.ico+' '+esc(c.nombre)+'</button>';
+  }).join('');
+  var cat = categoriasVisibles().find(function(c){ return c.id === catActual; }) || CATEGORIAS[0];
+  document.getElementById('notaCategoria').textContent = cat.nota || '';
+  var frases = todasLasFrases().filter(function(f){ return f.cat === catActual; });
+  listarGrabadas().then(function(grabadas){
+    document.getElementById('listaFrases').innerHTML = frases.map(function(f){
+      var tiene = grabadas.indexOf(f.id) >= 0;
+      return '<div class="frase" data-id="'+f.id+'">'+
+        '<div class="es">'+esc(f.es)+'</div>'+
+        (f.mi ? '<div class="mi">'+esc(f.mi)+'</div>' : '<div class="mi vacia">Falta la traducción</div>')+
+        '<div>'+chipEstado(f.mi ? f.estado : '')+(tiene?' <span class="chip ok">🎙️ Voz grabada</span>':'')+'</div>'+
+        '<div class="acciones">'+
+          (f.mi ? '<button class="pill" data-acc="oir">🔊 Escuchar</button>' : '')+
+          (!f.mi ? '<button class="pill morado" data-acc="ia">✨ Sugerir con IA</button>' : '')+
+          '<button class="pill sec" data-acc="editar">✏️ Corregir</button>'+
+          '<button class="pill coral" data-acc="grabar">🎙️ Grabar</button>'+
+        '</div></div>';
+    }).join('');
+  });
+}
+document.getElementById('pestanasFrases').addEventListener('click', function(e){
+  var b = e.target.closest('[data-cat]'); if(!b) return;
+  catActual = b.dataset.cat; pintarFrases();
+});
+document.getElementById('listaFrases').addEventListener('click', function(e){
+  var b = e.target.closest('[data-acc]'); if(!b) return;
+  var tarjeta = b.closest('.frase'), id = tarjeta.dataset.id;
+  var f = todasLasFrases().find(function(x){ return x.id === id; });
+  var acc = b.dataset.acc;
+  if(acc === 'oir') escucharMiskito(id, f.mi);
+  if(acc === 'grabar') alternarGrabacion(id, b);
+  if(acc === 'editar') abrirEditor(tarjeta, f);
+  if(acc === 'ia'){
+    if(!claveApi()){ alert('Para sugerir con IA, primero guarda una clave en «Ajustes y fuentes».'); return; }
+    b.disabled = true; b.textContent = '⏳ Pensando…';
+    traducirIA(f.es).then(function(r){
+      correcciones[id] = {mi:r.miskito, estado:'ia'}; guardar('mq_correcciones', correcciones); pintarFrases();
+    }).catch(function(err){ alert(err.message); b.disabled = false; b.textContent = '✨ Sugerir con IA'; });
+  }
+});
+function abrirEditor(tarjeta, f){
+  var acciones = tarjeta.querySelector('.acciones');
+  acciones.innerHTML = '<div class="editor"><input type="text" value="'+esc(f.mi)+'" aria-label="Traducción en miskito">'+
+    '<button class="pill verde" data-ok>Guardar</button><button class="pill sec" data-cancel>Cancelar</button></div>';
+  var inp = acciones.querySelector('input'); inp.focus();
+  acciones.querySelector('[data-ok]').onclick = function(){
+    var v = inp.value.trim();
+    if(v){ correcciones[f.id] = {mi:v, estado:'r'}; } else { delete correcciones[f.id]; }
+    guardar('mq_correcciones', correcciones); pintarFrases();
+  };
+  acciones.querySelector('[data-cancel]').onclick = pintarFrases;
+  inp.addEventListener('keydown', function(e){ if(e.key === 'Enter') acciones.querySelector('[data-ok]').click(); });
+}
+
+/* ---------- Diccionario ---------- */
+function pintarDiccionario(){
+  var q = normal(document.getElementById('buscar').value);
+  var filas = todasLasFrases().filter(function(f){ return f.mi; })
+    .filter(function(f){ return !q || normal(f.es).indexOf(q) >= 0 || normal(f.mi).indexOf(q) >= 0; })
+    .sort(function(a,b){ return a.es.localeCompare(b.es,'es'); });
+  document.getElementById('tablaDic').innerHTML = filas.length ? filas.map(function(f){
+    return '<tr><td>'+esc(f.es)+'</td><td class="mi">'+esc(f.mi)+' '+chipEstado(f.estado)+'</td>'+
+      '<td><button class="pill chico" data-oir="'+f.id+'" aria-label="Escuchar '+esc(f.mi)+'">🔊</button></td></tr>';
+  }).join('') : '<tr><td colspan="3">No se encontró esa palabra.</td></tr>';
+}
+document.getElementById('buscar').addEventListener('input', pintarDiccionario);
+document.getElementById('tablaDic').addEventListener('click', function(e){
+  var b = e.target.closest('[data-oir]'); if(!b) return;
+  var f = todasLasFrases().find(function(x){ return x.id === b.dataset.oir; });
+  if(f) escucharMiskito(f.id, f.mi);
+});
+
+/* ---------- Reconocimiento de voz ---------- */
+var txtEs = document.getElementById('txtEs');
+var estado = document.getElementById('estado');
+var btnHablar = document.getElementById('btnHablar');
+var Reconocedor = window.SpeechRecognition || window.webkitSpeechRecognition;
+var reco = null, escuchando = false;
+if(!Reconocedor){
+  btnHablar.disabled = true;
+  btnHablar.title = 'Este navegador no reconoce voz. Usa Chrome.';
+}
+btnHablar.addEventListener('click', function(){
+  if(!Reconocedor) return;
+  if(escuchando){ reco.stop(); return; }
+  detenerTodo();
+  reco = new Reconocedor();
+  reco.lang = 'es-US';
+  reco.interimResults = true;
+  reco.continuous = false;
+  var base = txtEs.value ? txtEs.value.trim() + ' ' : '';
+  reco.onresult = function(e){
+    var t = '';
+    for(var i=0;i<e.results.length;i++) t += e.results[i][0].transcript;
+    txtEs.value = base + t;
+  };
+  reco.onstart = function(){ escuchando = true; btnHablar.classList.add('grabando'); btnHablar.textContent = '⏹️ Escuchando…'; estado.textContent = 'Habla ahora en español.'; };
+  reco.onerror = function(e){ estado.textContent = e.error === 'not-allowed' ? 'Permite el uso del micrófono para poder escuchar.' : 'No se escuchó bien. Intenta otra vez.'; };
+  reco.onend = function(){
+    escuchando = false; btnHablar.classList.remove('grabando'); btnHablar.textContent = '🎙️ Hablar';
+    if(txtEs.value.trim()){ estado.textContent = ''; traducir(); }
+  };
+  reco.start();
+});
+document.getElementById('btnLimpiar').addEventListener('click', function(){
+  txtEs.value = ''; estado.textContent = ''; document.getElementById('panelResultado').classList.add('oculto'); txtEs.focus();
+});
+
+/* ---------- Traducción ---------- */
+var ultimo = null; // {es, mi, retro, nota, estado, id}
+
+function buscarFraseExacta(es){
+  var n = normal(es);
+  return todasLasFrases().find(function(f){ return f.mi && normal(f.es) === n; }) || null;
+}
+// Diccionario palabra por palabra
+var VACIAS = ['el','la','y','o','e','ni','pero','muy','los','las','un','una','unos','unas','de','del','al','y','a','en','que','por','para','con','es','mi','tu','su','se','me','te','lo'];
+function indicePalabras(){
+  var idx = {};
+  todasLasFrases().forEach(function(f){
+    if(!f.mi) return;
+    f.es.split('/').forEach(function(parte){
+      var n = normal(parte.replace(/\(.*?\)/g,''));
+      if(n && n.split(' ').length <= 2 && !idx[n]) idx[n] = f;
+    });
+  });
+  return idx;
+}
+function palabraPorPalabra(es){
+  var idx = indicePalabras();
+  return normal(es).split(' ').filter(Boolean).map(function(w){
+    if(VACIAS.indexOf(w) >= 0) return {es:w, f:null, vacia:true};
+    // Plurales y verbos conjugados sencillos (come → comer, juegas → jugar)
+    var raiz = w.replace(/(amos|emos|imos|an|en|as|es|a|e|o)$/,'');
+    var candidatos = [w, w.slice(0,-1), w.slice(0,-2), w+'r', raiz+'ar', raiz+'er', raiz+'ir',
+                      raiz.replace(/ue/,'o')+'ar', raiz.replace(/ue/,'u')+'ar', raiz.replace(/ie/,'e')+'er'];
+    var f = null;
+    if(raiz.length < 2) candidatos = candidatos.slice(0,4);
+    for(var i=0;i<candidatos.length && !f;i++){ if(candidatos[i].length > 1) f = idx[candidatos[i]] || null; }
+    return {es:w, f:f, vacia: VACIAS.indexOf(w) >= 0};
+  });
+}
+
+function claveApi(){ return leer('mq_clave', ''); }
+
+function glosario(){
+  return todasLasFrases().filter(function(f){ return f.mi && (f.estado === 'f' || f.estado === 'r'); })
+    .map(function(f){ return f.es + ' = ' + f.mi; }).join('\n');
+}
+
+var SISTEMA = [
+  'Eres un traductor experto en la lengua miskita (miskitu) de Nicaragua, variante de la Costa Caribe Norte (Bilwi / Puerto Cabezas y el río Coco / Wangki), como se usa en la educación intercultural bilingüe.',
+  'Traduces del español al miskito para una niña miskita que está aprendiendo español en la escuela.',
+  'Reglas:',
+  '- No traduzcas palabra por palabra: adapta la idea a cómo la diría naturalmente una persona miskita, con palabras sencillas para una niña.',
+  '- El miskito pone el verbo al final (sujeto-objeto-verbo) y usa posposiciones (ra, wal, wina, kat).',
+  '- Usa la ortografía nicaragüense habitual: vocales a, i, u (y e, o solo en préstamos), vocales largas con circunflejo (â, î, û) cuando corresponda.',
+  '- Prefiere el vocabulario del glosario verificado que se te da. Basate en el Diccionario Miskito-Español de Heath y Marx y en el uso actual de Nicaragua.',
+  '- Si no conoces una palabra con seguridad, usa el préstamo del inglés criollo o del español que usan los hablantes, y dilo en las notas.',
+  '- Sé honesto sobre tu seguridad: el miskito tiene pocos textos digitales.',
+  'Devuelve solo JSON con: miskito (la traducción), retro_espanol (qué dice tu traducción, de vuelta al español, literal), notas (breve, en español, para la docente: palabras dudosas o adaptaciones), confianza ("alta", "media" o "baja").'
+].join('\n');
+
+function traducirIA(es){
+  var clave = claveApi();
+  if(!clave) return Promise.reject(new Error('No hay clave de API.'));
+  var cuerpo = {
+    model: 'claude-opus-5-5',
+    max_tokens: 4000,
+    output_config: {
+      effort: 'medium',
+      format: { type: 'json_schema', schema: {
+        type: 'object', additionalProperties: false,
+        required: ['miskito','retro_espanol','notas','confianza'],
+        properties: {
+          miskito: {type:'string'}, retro_espanol: {type:'string'}, notas: {type:'string'},
+          confianza: {type:'string', enum:['alta','media','baja']}
+        }
+      }}
+    },
+    system: SISTEMA + '\n\nGlosario verificado (español = miskito):\n' + glosario(),
+    messages: [{role:'user', content: 'Traduce al miskito de Nicaragua:\n' + es}]
+  };
+  return fetch('https://api.anthropic.com/v1/messages', {
+    method:'POST',
+    headers:{
+      'content-type':'application/json',
+      'x-api-key': clave,
+      'anthropic-version':'2026-10-21',
+      'anthropic-dangerous-direct-browser-access':'true'
+    },
+    body: JSON.stringify(cuerpo)
+  }).then(function(r){
+    return r.json().then(function(d){
+      if(!r.ok){
+        var msg = d && d.error && d.error.message ? d.error.message : ('Error ' + r.status);
+        if(r.status === 401) msg = 'La clave de API no es válida.';
+        if(r.status === 429) msg = 'Demasiadas solicitudes. Espera un momento.';
+        throw new Error(msg);
+      }
+      if(d.stop_reason === 'refusal') throw new Error('La IA no pudo traducir esta frase.');
+      var bloque = (d.content || []).find(function(b){ return b.type === 'text'; });
+      if(!bloque) throw new Error('La IA no devolvió texto.');
+      var t = bloque.text.trim().replace(/^```(json)?/,'').replace(/```$/,'');
+      return JSON.parse(t);
+    });
+  }, function(){ throw new Error('Sin conexión a internet. Usa el banco de frases o el diccionario.'); });
+}
+
+function mostrarResultado(r){
+  ultimo = r;
+  document.getElementById('panelResultado').classList.remove('oculto');
+  document.getElementById('resMiskito').textContent = r.mi || '—';
+  document.getElementById('resChip').innerHTML = chipEstado(r.estado) + (r.origen ? ' <span class="nota">'+esc(r.origen)+'</span>' : '');
+  document.getElementById('resRetro').innerHTML = r.retro ? '<b>Dice:</b> ' + esc(r.retro) : '';
+  document.getElementById('resNota').textContent = r.nota || '';
+  document.getElementById('resPalabras').innerHTML = (r.palabras || []).map(function(p){
+    return p.f ? '<span class="palabra">'+esc(p.es)+' → <b>'+esc(p.f.mi)+'</b></span>'
+               : '<span class="palabra falta">'+esc(p.es)+' → ?</span>';
+  }).join('');
+  document.getElementById('btnEscucharMi').disabled = !r.mi;
+  document.getElementById('btnGuardarFrase').classList.toggle('oculto', !r.mi || r.estado === 'f' || r.estado === 'r');
+  document.getElementById('panelResultado').scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function traducir(){
+  var es = txtEs.value.trim();
+  if(!es){ estado.textContent = 'Escribe o di una frase primero.'; return; }
+  detenerTodo();
+  var exacta = buscarFraseExacta(es);
+  if(exacta){
+    estado.textContent = '';
+    mostrarResultado({es:es, mi:exacta.mi, estado:exacta.estado, origen:'Banco de frases', id:exacta.id});
+    escucharMiskito(exacta.id, exacta.mi);
+    return;
+  }
+  if(claveApi()){
+    estado.textContent = '⏳ Traduciendo con inteligencia artificial…';
+    document.getElementById('btnTraducir').disabled = true;
+    traducirIA(es).then(function(r){
+      estado.textContent = '';
+      var id = idFrase(es);
+      mostrarResultado({es:es, mi:r.miskito, retro:r.retro_espanol, estado:'ia',
+        origen:'Confianza ' + r.confianza, nota: r.notas ? 'Nota: ' + r.notas : '', id:id});
+      escucharMiskito(id, r.miskito);
+    }).catch(function(err){
+      estado.textContent = '⚠️ ' + err.message + ' Se muestra la traducción palabra por palabra.';
+      porPalabras(es);
+    }).then(function(){ document.getElementById('btnTraducir').disabled = false; });
+    return;
+  }
+  estado.textContent = 'Sin clave de IA: se traduce palabra por palabra. Puedes agregar la clave en «Ajustes y fuentes».';
+  porPalabras(es);
+}
+function porPalabras(es){
+  var pal = palabraPorPalabra(es).filter(function(p){ return !p.vacia || p.f; });
+  var mi = pal.filter(function(p){ return p.f; }).map(function(p){ return p.f.mi.replace(/[?…]/g,''); }).join(' ');
+  mostrarResultado({es:es, mi:mi, estado:'v', origen:'Diccionario, palabra por palabra',
+    nota: mi ? 'Solo se tradujeron las palabras conocidas; el orden puede no ser el correcto en miskito.' : 'No se encontraron palabras conocidas.',
+    palabras: pal, id: idFrase(es)});
+}
+document.getElementById('btnTraducir').addEventListener('click', traducir);
+txtEs.addEventListener('keydown', function(e){ if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); traducir(); } });
+document.getElementById('btnEscucharMi').addEventListener('click', function(){ if(ultimo) escucharMiskito(ultimo.id, ultimo.mi); });
+document.getElementById('btnGuardarFrase').addEventListener('click', function(){
+  if(!ultimo || !ultimo.mi) return;
+  if(!misFrases.some(function(f){ return idFrase(f.es) === idFrase(ultimo.es); })){
+    misFrases.push({es:ultimo.es, mi:ultimo.mi, estado:ultimo.estado});
+    guardar('mq_misfrases', misFrases);
+  }
+  estado.textContent = '⭐ Guardada en «Frases → Mis frases». Ahí se puede corregir y grabar.';
+});
+
+/* ---------- Ajustes ---------- */
+function pintarClave(){
+  var c = claveApi();
+  document.getElementById('clave').value = '';
+  document.getElementById('estadoClave').textContent = c ? '✅ Hay una clave guardada en este equipo (termina en …' + c.slice(-4) + ').' : 'No hay clave guardada.';
+}
+document.getElementById('btnGuardarClave').addEventListener('click', function(){
+  var v = document.getElementById('clave').value.trim();
+  if(!v){ document.getElementById('estadoClave').textContent = 'Escribe la clave primero.'; return; }
+  guardar('mq_clave', v); pintarClave();
+});
+document.getElementById('btnBorrarClave').addEventListener('click', function(){
+  try{ localStorage.removeItem('mq_clave'); }catch(e){} pintarClave();
+});
+document.getElementById('btnExportar').addEventListener('click', function(){
+  var datos = JSON.stringify({correcciones:correcciones, misFrases:misFrases}, null, 2);
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([datos], {type:'application/json'}));
+  a.download = 'correcciones-miskito.json'; a.click();
+});
+document.getElementById('btnImportar').addEventListener('click', function(){ document.getElementById('archivoImportar').click(); });
+document.getElementById('archivoImportar').addEventListener('change', function(e){
+  var f = e.target.files[0]; if(!f) return;
+  f.text().then(function(t){
+    var d = JSON.parse(t);
+    Object.assign(correcciones, d.correcciones || {});
+    (d.misFrases || []).forEach(function(m){ if(!misFrases.some(function(x){ return idFrase(x.es) === idFrase(m.es); })) misFrases.push(m); });
+    guardar('mq_correcciones', correcciones); guardar('mq_misfrases', misFrases);
+    alert('Correcciones importadas.');
+  }).catch(function(){ alert('El archivo no es válido.'); });
+});
+
+/* ---------- Contenido para imprimir y PDF ---------- */
+var ESTADO_TXT = {f:'fuente', r:'revisada', ia:'IA aproximada', v:'por verificar'};
+function contenidoFicha(seccion){
+  var titulo, lineas = [];
+  if(seccion === 'traducir'){
+    titulo = 'Traducción español – miskito';
+    if(ultimo){
+      lineas.push('Español: ' + ultimo.es);
+      lineas.push('Miskito: ' + (ultimo.mi || '—'));
+      if(ultimo.retro) lineas.push('Dice: ' + ultimo.retro);
+      lineas.push('Estado: ' + (ESTADO_TXT[ultimo.estado] || ''));
+      if(ultimo.nota) lineas.push(ultimo.nota);
+    }
+  } else if(seccion === 'frases'){
+    var cat = categoriasVisibles().find(function(c){ return c.id === catActual; });
+    titulo = 'Frases: ' + (cat ? cat.nombre : '');
+    todasLasFrases().filter(function(f){ return f.cat === catActual; }).forEach(function(f){
+      lineas.push(f.es + '  —  ' + (f.mi || '_______________') + (f.mi && f.estado !== 'f' ? '  (' + ESTADO_TXT[f.estado] + ')' : ''));
+    });
+  } else {
+    titulo = 'Diccionario español – miskito';
+    todasLasFrases().filter(function(f){ return f.mi; }).sort(function(a,b){ return a.es.localeCompare(b.es,'es'); })
+      .forEach(function(f){ lineas.push(f.es + '  —  ' + f.mi); });
+  }
+  return {titulo:titulo, lineas:lineas, autoria:'Elaborado por: Alberto Jiménez Ruiz — Asesor Regional de Matemática · DAP-DRE-Cartago 2026'};
+}
+document.querySelectorAll('[data-imprimir]').forEach(function(b){
+  b.addEventListener('click', function(){
+    var c = contenidoFicha(b.dataset.imprimir);
+    document.getElementById('zonaImpresion').innerHTML = '<h1>'+esc(c.titulo)+'</h1>' +
+      c.lineas.map(function(l){ return '<p class="linea">'+esc(l)+'</p>'; }).join('') +
+      '<p style="margin-top:14pt;font-size:10pt">'+esc(c.autoria)+'</p>';
+    window.print();
+  });
+});
+
+/* PDF propio: Helvetica (equivalente a Arial) 12 pt, sin bibliotecas */
+function anchoTexto(t, tam){
+  var w = 0;
+  for(var i=0;i<t.length;i++){
+    var c = t[i];
+    if(c === ' ') w += 0.278;
+    else if('iljI.,;:!|\'’'.indexOf(c) >= 0) w += 0.24;
+    else if('mwMW'.indexOf(c) >= 0) w += 0.85;
+    else if(c >= 'A' && c <= 'Z') w += 0.68;
+    else w += 0.54;
+  }
+  return w * tam;
+}
+function partirLineas(t, ancho, tam){
+  var palabras = t.split(' '), lineas = [], actual = '';
+  palabras.forEach(function(p){
+    var prueba = actual ? actual + ' ' + p : p;
+    if(anchoTexto(prueba, tam) > ancho && actual){ lineas.push(actual); actual = p; }
+    else actual = prueba;
+  });
+  if(actual) lineas.push(actual);
+  return lineas;
+}
+function aWinAnsi(t){
+  var mapa = {'—':151,'–':150,'‘':145,'’':146,'“':147,'”':148,'…':133,'·':183};
+  var s = '';
+  for(var i=0;i<t.length;i++){
+    var ch = t[i], code = t.charCodeAt(i);
+    if(mapa[ch]) code = mapa[ch];
+    else if(code > 255) continue; // quita emojis y otros símbolos
+    var c = String.fromCharCode(code);
+    if(c === '(' || c === ')' || c === '\\') c = '\\' + c;
+    s += c;
+  }
+  return s;
+}
+function crearPDF(c){
+  var W = 612, H = 792, M = 56, tam = 12, inter = 17, anchoUtil = W - 2*M;
+  var paginas = [], ops = [], y = H - M;
+  function nuevaPagina(){ if(ops.length) paginas.push(ops.join('\n')); ops = []; y = H - M; }
+  function escribir(t, fuente, t2){
+    partirLineas(t, anchoUtil, t2).forEach(function(l){
+      if(y < M + inter){ nuevaPagina(); }
+      ops.push('BT /' + fuente + ' ' + t2 + ' Tf ' + M + ' ' + y.toFixed(1) + ' Td (' + aWinAnsi(l) + ') Tj ET');
+      y -= t2 === tam ? inter : t2 + 6;
+    });
+  }
+  escribir(c.titulo, 'F2', 16); y -= 8;
+  c.lineas.forEach(function(l){ escribir(l, 'F1', tam); y -= 4; });
+  y -= 12; escribir(c.autoria, 'F1', 10);
+  nuevaPagina();
+
+  var objs = [];
+  objs[1] = '<< /Type /Catalog /Pages 2 0 R >>';
+  objs[3] = '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>';
+  objs[4] = '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>';
+  var kids = [];
+  paginas.forEach(function(contenido){
+    var nPag = objs.length, nCont = nPag + 1;
+    objs[nPag] = '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ' + W + ' ' + H + '] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents ' + nCont + ' 0 R >>';
+    objs[nCont] = '<< /Length ' + contenido.length + ' >>\nstream\n' + contenido + '\nendstream';
+    kids.push(nPag + ' 0 R');
+  });
+  objs[2] = '<< /Type /Pages /Kids [' + kids.join(' ') + '] /Count ' + kids.length + ' >>';
+
+  var pdf = '%PDF-1.4\n%\xE2\xE3\xCF\xD3\n', offs = [];
+  for(var i=1;i<objs.length;i++){ offs[i] = pdf.length; pdf += i + ' 0 obj\n' + objs[i] + '\nendobj\n'; }
+  var xref = pdf.length;
+  pdf += 'xref\n0 ' + objs.length + '\n0000000000 65535 f \n';
+  for(i=1;i<objs.length;i++) pdf += ('0000000000' + offs[i]).slice(-10) + ' 00000 n \n';
+  pdf += 'trailer\n<< /Size ' + objs.length + ' /Root 1 0 R >>\nstartxref\n' + xref + '\n%%EOF';
+  var bytes = new Uint8Array(pdf.length);
+  for(i=0;i<pdf.length;i++) bytes[i] = pdf.charCodeAt(i) & 255;
+  return new Blob([bytes], {type:'application/pdf'});
+}
+document.querySelectorAll('[data-pdf]').forEach(function(b){
+  b.addEventListener('click', function(){
+    var c = contenidoFicha(b.dataset.pdf);
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(crearPDF(c));
+    a.download = c.titulo.replace(/[^\wáéíóúñü ]+/gi,'').trim().replace(/\s+/g,'-').toLowerCase() + '.pdf';
+    document.body.appendChild(a); a.click(); a.remove();
+  });
+});
+
+})();
+</script>
+</body>
+</html>

@@ -686,6 +686,23 @@ function guardarGrabacion(id, blob){
     });
   });
 }
+function borrarGrabacion(id){
+  return dbPromesa.then(function(db){
+    if(!db) return;
+    return new Promise(function(res){
+      try{
+        var tx = db.transaction('grabaciones','readwrite');
+        tx.objectStore('grabaciones').delete(id);
+        tx.oncomplete = res; tx.onerror = res;
+      }catch(e){ res(); }
+    });
+  });
+}
+function confirmarBorrado(id, repintar){
+  if(!confirm('¿Borrar la grabación? Se volverá a escuchar la voz de la computadora.')) return;
+  detenerTodo();
+  borrarGrabacion(id).then(repintar);
+}
 function listarGrabadas(){
   return dbPromesa.then(function(db){
     if(!db) return [];
@@ -769,7 +786,8 @@ function pintarFrases(){
           (f.mi ? '<button class="pill" data-acc="oir">🔊 Escuchar</button>' : '')+
           (!f.mi ? '<button class="pill morado" data-acc="ia">✨ Sugerir con IA</button>' : '')+
           '<button class="pill sec" data-acc="editar">✏️ Corregir</button>'+
-          '<button class="pill coral" data-acc="grabar">🎙️ Grabar</button>'+
+          '<button class="pill coral" data-acc="grabar">🎙️ '+(tiene ? 'Grabar de nuevo' : 'Grabar')+'</button>'+
+          (tiene ? '<button class="pill sec" data-acc="borrarvoz">🗑️ Borrar grabación</button>' : '')+
         '</div></div>';
     }).join('');
   });
@@ -786,6 +804,7 @@ document.getElementById('listaFrases').addEventListener('click', function(e){
   if(acc === 'oir') escucharMiskito(id, f.mi);
   if(acc === 'grabar') alternarGrabacion(id, b);
   if(acc === 'editar') abrirEditor(tarjeta, f);
+  if(acc === 'borrarvoz') confirmarBorrado(id, pintarFrases);
   if(acc === 'ia'){
     if(!claveApi()){ alert('Para sugerir con IA, primero guarda una clave en «Ajustes y fuentes».'); return; }
     b.disabled = true; b.textContent = '⏳ Pensando…';
@@ -942,7 +961,8 @@ function pintarImagenes(){
                 '<button class="pill azul" data-acc="es">🗣️ En español</button>' +
                 (!im.mi ? '<button class="pill morado" data-acc="ia">✨ Sugerir con IA</button>' : '') +
                 '<button class="pill sec" data-acc="editar">✏️ Corregir</button>' +
-                '<button class="pill coral" data-acc="grabar">🎙️ Grabar</button>' +
+                '<button class="pill coral" data-acc="grabar">🎙️ ' + (tiene ? 'Grabar de nuevo' : 'Grabar') + '</button>' +
+                (tiene ? '<button class="pill sec" data-acc="borrarvoz">🗑️ Borrar grabación</button>' : '') +
               '</div></div></div>';
         }).join('') + '</div>';
     }).join('');
@@ -957,6 +977,7 @@ document.getElementById('tablero').addEventListener('click', function(e){
   if(acc === 'es') decir(im.es, 'es-' + id);
   if(acc === 'grabar') alternarGrabacion(id, b);
   if(acc === 'editar') abrirEditor(tarjeta, im, pintarImagenes);
+  if(acc === 'borrarvoz') confirmarBorrado(id, pintarImagenes);
   if(acc === 'ia'){
     if(!claveApi()){ alert('Para sugerir con IA, primero guarda una clave en «Ajustes y fuentes».'); return; }
     b.disabled = true; b.textContent = '⏳ Pensando…';

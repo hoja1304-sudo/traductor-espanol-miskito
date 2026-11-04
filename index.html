@@ -124,7 +124,11 @@ td .pill{min-height:44px;padding:4px 12px}
 .parrafo .es{color:var(--muted);font-size:.95rem;grid-column:1}
 .parrafo .mi{color:var(--mar);font-weight:700;font-size:1.2rem;grid-column:1}
 [data-theme="dark"] .parrafo .mi{color:#7fd8e3}
-.parrafo .pill{grid-column:2;grid-row:1 / span 2}
+.parrafo .botones-parrafo{grid-column:2;grid-row:1 / span 2;display:flex;flex-direction:column;gap:6px}
+.conjugar table td,.conjugar table th{text-align:center}
+.conjugar td.verbo{font-weight:700;color:var(--mar);font-size:1.1rem}
+[data-theme="dark"] .conjugar td.verbo{color:#7fd8e3}
+.conjugar select{min-height:48px;border-radius:12px;border:2px solid var(--line);background:var(--bg);padding:6px 12px;font-size:1rem}
 .camara{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;gap:12px}
 .camara video{max-width:100%;max-height:72vh;border-radius:14px;background:#000}
 
@@ -212,7 +216,8 @@ label{display:block;font-weight:600;margin:10px 0 4px}
       <p class="etq">Miskito</p>
       <div class="miskito-grande" id="resMiskito"></div>
       <div class="fila" style="margin-top:0">
-        <button class="pill" id="btnEscucharMi">🔊 Escuchar en miskito</button>
+        <button class="pill" id="btnEscucharMi">🔊 Miskito</button>
+        <button class="pill azul" id="btnEscucharEs">🗣️ Español</button>
         <span id="resChip"></span>
       </div>
       <p class="retro" id="resRetro"></p>
@@ -255,6 +260,19 @@ label{display:block;font-weight:600;margin:10px 0 4px}
       <thead><tr><th>Español</th><th>Miskito</th><th></th></tr></thead>
       <tbody id="tablaDic"></tbody>
     </table>
+  </div>
+  <div class="panel conjugar">
+    <h3 style="margin-top:0">🏃 Conjugar un verbo</h3>
+    <p class="nota">Regla del material MEP: la raíz es el verbo sin «aia» (piaia → <b>pi</b>) y se le agrega la terminación según la persona y el tiempo.</p>
+    <label for="selVerbo">Verbo</label>
+    <select id="selVerbo"></select>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>Persona</th><th>Pasado</th><th>Presente</th><th>Futuro</th></tr></thead>
+        <tbody id="tablaConj"></tbody>
+      </table>
+    </div>
+    <p class="nota">Toca una forma para escucharla. Es la regla general: algunos verbos pueden tener formas especiales.</p>
   </div>
   <div class="fila">
     <button class="pill sec chico" data-imprimir="diccionario">🖨️ Imprimir</button>
@@ -370,6 +388,7 @@ label{display:block;font-weight:600;margin:10px 0 4px}
     <h3 style="margin-top:0">Fuentes del vocabulario</h3>
     <p>El miskito es la lengua indígena más hablada de Nicaragua (Costa Caribe Norte, río Coco / Wangki, Bilwi). Su ortografía usa tres vocales básicas (<b>a, i, u</b>) y vocales largas (<b>â, î, û</b>), y todavía varía entre autores.</p>
     <ul class="fuentes">
+      <li><b>Ministerio de Educación Pública de Costa Rica.</b> <i>Material de apoyo para docentes que atienden población miskita</i>, elaborado por Lizeth Pictan Chacón, docente de lengua miskito (Dirección Regional de Educación San José Oeste, Supervisión Educativa Circuito 02). Es la fuente principal de la app: de aquí salen los saludos, la cortesía, las normas de clase, la higiene y la salud, las emociones, la familia, el cuerpo, la ropa, los colores, los animales, la naturaleza, los días, las formas, los adjetivos, las preposiciones, los verbos y la regla para conjugarlos.</li>
       <li><b>Heath, G. R. y Marx, W. G.</b> <i>Diccionario Miskito-Español, Español-Miskito</i> (1961; 3.ª ed. 1983). El diccionario bilingüe de referencia. <a href="https://glottolog.org/resource/reference/id/59872" target="_blank" rel="noopener">Ficha en Glottolog</a></li>
       <li><b>Vaughan Warman, A.</b> <i>Diccionario trilingüe miskito-español-inglés</i>, Managua (1959). Hecho por un hablante nativo nicaragüense.</li>
       <li><b>Melgara, D.</b> Diccionario español-miskito / miskito-español, reseñado en la revista <i>WANI</i> (CIDCA-UCA, Nicaragua). <a href="https://camjol.info/index.php/WANI/article/view/881" target="_blank" rel="noopener">Artículo en WANI</a></li>
@@ -378,7 +397,7 @@ label{display:block;font-weight:600;margin:10px 0 4px}
       <li><b>Wikipedia:</b> «Miskito grammar» (saludos, pronombres, números y verbos). <a href="https://en.wikipedia.org/wiki/Miskito_grammar" target="_blank" rel="noopener">Artículo</a></li>
       <li><b>AILLA</b> (Universidad de Texas): colección de audio y narraciones en miskito de N. Bermúdez y W. L. Waldan Peter.</li>
     </ul>
-    <p class="nota">Etiquetas: <span class="chip ok">Fuente</span> = tomada de las fuentes anteriores · <span class="chip warn">Por verificar</span> = propuesta, falta revisión de un hablante · <span class="chip ia">IA aproximada</span> = traducción automática · <span class="chip ok">Revisada</span> = corregida en este equipo.</p>
+    <p class="nota">Etiquetas: <span class="chip ok">Material MEP</span> = del material de apoyo bilingüe del MEP · <span class="chip ok">Fuente</span> = tomada de las otras fuentes · <span class="chip warn">Por verificar</span> = propuesta, falta revisión de un hablante · <span class="chip ia">IA aproximada</span> = traducción automática · <span class="chip ok">Revisada</span> = corregida en este equipo.</p>
   </div>
 </main>
 
@@ -392,148 +411,451 @@ label{display:block;font-weight:600;margin:10px 0 4px}
 function leer(k, def){ try{ var v = localStorage.getItem(k); return v === null ? def : JSON.parse(v); }catch(e){ return def; } }
 function guardar(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
 
-/* ---------- Datos: vocabulario (fuente: Wikipedia, Wikibooks) ---------- */
-// [español, miskito, estado]  estado: 'f' fuente, 'v' por verificar
+/* ---------- Datos: vocabulario ---------- */
+// [español, miskito, estado]  estado: 'mep' Material de apoyo bilingüe del MEP (prioridad),
+// 'f' otras fuentes (Wikipedia, Wikibooks), 'v' por verificar
 var CATEGORIAS = [
-  {id:'saludos', nombre:'Saludos', ico:'👋', frases:[
-    ['Hola','Naksa','f'],
-    ['Buenos días','Titan yamni','f'],
-    ['Buenas tardes','Tutni yamni','f'],
-    ['Buenas noches','Saiwan yamni','f'],
-    ['Mucho gusto','Uba lilia','f'],
-    ['Me llamo…','Yang nini…','f'],
+  {id:'saludos', nombre:'Saludos y presentación', ico:'👋', frases:[
+    ['Hola','Naksa','mep'],
+    ['¿Cómo estás?','Nahkisma?','mep'],
+    ['¿Cómo te sientes?','Nahki damra walisma?','mep'],
+    ['Buenos días','Titan yamni','mep'],
+    ['Buenas tardes (al mediodía)','Dinar yamni','mep'],
+    ['Buenas tardes','Tutni yamni','mep'],
+    ['Buenas noches','Tihmia yamni','mep'],
+    ['¿Cómo te llamas?','Ninam dia?','mep'],
+    ['Yo me llamo…','Yang nini ba…','mep'],
+    ['¿Cuántos años tienes?','An mani brisma?','mep'],
+    ['Yo tengo … años','Yang … mani brisna','mep'],
+    ['¡Bienvenidos!','Yamni balram','mep'],
+    ['Es un placer conocerte','Uba yamni mai kakaira takri ba','mep'],
+    ['Pasa, estás en tu casa','Dims, wamtlarasma','mep'],
+    ['¿Cómo te puedo ayudar?','Nahki hilp mai munaia sipsna?','mep'],
     ['¿De dónde eres?','Man ani wina?','f'],
-    ['Sí','Au','f'],
-    ['No','Apia','f'],
-    ['Gracias','Tingki','v'],
-    ['Muchas gracias','Tingki pali','v'],
-    ['¿Cómo estás?','Nahki sma?','v'],
-    ['Estoy bien','Yang pain sna','v']
+    ['Sí','Au','mep'],
+    ['No','Apia','mep']
   ]},
-  {id:'escuela', nombre:'Escuela', ico:'🏫', frases:[
-    ['Escuela','Skul','f'],
-    ['Libro','Buk','f'],
+  {id:'cortesia', nombre:'Cortesía y despedida', ico:'💐', frases:[
+    ['Por favor','Du pali / plis','mep'],
+    ['Gracias','Tingki','mep'],
+    ['Muchas gracias','Tingki pali','mep'],
+    ['De nada','Trabil apia / bahki','mep'],
+    ['Un placer','Yamni pali','mep'],
+    ['Perdón / disculpe','Padin aimuns','mep'],
+    ['Con permiso','Iskius','mep'],
+    ['Adiós / hasta luego','Aisabi','mep'],
+    ['Que tengas un buen día','Yua yamni bris','mep'],
+    ['Fue un gusto verte','Uba yamni mai kaikisna','mep'],
+    ['Nos vemos pronto','Kli wal praubia','mep']
+  ]},
+  {id:'clase', nombre:'Normas de clase', ico:'✏️', frases:[
+    ['Levanta la mano para hablar o participar','Mihtam bukaia sturi aisaia wantsma pyuara','mep'],
+    ['Escucha con atención cuando otras personas hablan','Sap walaia upla kum sturi aisi pyuara','mep'],
+    ['Usa palabras amables como por favor, gracias y permiso','Sturi yamni nani yus muns aisisma pyuara: plis, tingki an iskius','mep'],
+    ['Respeta a tus compañeros y a tu docente','Rispik munaia pamnika an maistrukam ra','mep'],
+    ['Mantén tu espacio limpio y ordenado','Iwisma pliska ba wapni an klin briaia','mep'],
+    ['Camina dentro del aula; no corras','Klas bilara wapi taukaia, palaia apia','mep'],
+    ['Puntualidad y asistencia','Kul dakbaia apia an sun balaia','mep'],
+    ['Sigue las instrucciones del docente','Maistrukam dia mai wiba bila walaia','mep'],
+    ['Espera tu turno para hablar','Bila kaiks man taim aisaia pyuara','mep'],
+    ['Permanece sentado cuando sea necesario','Pliskam ar sir kam ra iwi bas','mep'],
+    ['Deposita la basura en su lugar','Dipasta ba pliskara mangks','mep'],
+    ['Vamos','Kaisa','mep'],
+    ['Sentarse','Iwaia','mep'],
+    ['Ponerse de pie','Buaia','mep'],
+    ['Salir','Takaia','mep'],
+    ['Escribir','Ulbaia','mep'],
+    ['Hablar','Aisaia','mep'],
+    ['Leer','Aisi kaikaia','mep'],
+    ['Colorear','Pint munaia','mep'],
+    ['Dibujar','Lilka paskaia','mep'],
+    ['Ya terminó','Danh takram','mep'],
+    ['Venga','Bal','mep'],
+    ['Despacio','Tawa','mep'],
+    ['Rápido','Isti','mep'],
+    ['Silencio','Sap takaia','mep'],
+    ['¿Te gusta tu escuela?','Kul kam watla na laiksma?','mep'],
+    ['¿Te gusta tu salón de clase?','Klas mai smalki na pliska laiksma?','mep'],
+    ['Sí me gusta','Au laiksna','mep'],
+    ['No, no me gusta','Apia, laik apia','mep'],
+    ['Voy a la biblioteca','Wauhtaya aisi kaikaia pliska ra auna','mep'],
+    ['Voy a la sala de cómputo','Kumputadura lan takaia pliskara auna','mep'],
+    ['Voy a la oficina del director','Ta brabrira pliskara auna','mep'],
+    ['Voy al comedor','Plun piaia pliska ra auna','mep'],
+    ['Mi escuela es bonita','Skulki watla na painkira sa','mep']
+  ]},
+  {id:'escuela', nombre:'Útiles y escuela', ico:'🏫', frases:[
+    ['Cuaderno','Ulbaia wauhtaika','mep'],
+    ['Lápiz','Pinsil','mep'],
+    ['Libro','Buk','mep'],
+    ['Mochila','Surun ar muchila','mep'],
+    ['Borrador','Dikaika','mep'],
+    ['Sacapuntas / tajador','Pinsil ta daukaika','mep'],
+    ['Lapicero','Ink pinsil','mep'],
+    ['Lápices de colores','Pint munaia pinsilka','mep'],
+    ['Regla','Lain nani paskaika','mep'],
+    ['Cartuchera','Pinsil nani surun ka','mep'],
+    ['Escuela','Skul watla','mep'],
+    ['Aula / salón de clases','Smalkaia pliska','mep'],
+    ['Biblioteca','Wauhtaya aisi kaikaia pliska','mep'],
+    ['Sala de cómputo','Kumputadura lan takaia pliska','mep'],
+    ['Oficina del director','Ta brabrira pliska','mep'],
+    ['Sala de profesores','Smasmalkra nani takaski pliska','mep'],
+    ['Cancha / gimnasio','Wan wîna trin munaia pliska','mep'],
+    ['Comedor','Plun piaia pliska','mep'],
+    ['Baño / servicios','Tailit ar klasit','mep'],
+    ['Docente','Smasmalkra','mep'],
     ['Mesa','Tibil','f'],
     ['Silla','Iwaika','f'],
     ['Puerta','Dur','f'],
     ['Ventana','Windar','f'],
     ['Aprender','Lan takaia','f'],
     ['Enseñar','Lan daukaia','f'],
-    ['Leer','Aisi kaikaia','f'],
-    ['Escribir','Ulbaia','f'],
-    ['Hablar','Aisaia','f'],
-    ['Escuchar / oír','Walaia','f'],
-    ['Ver','Kaikaia','f'],
-    ['Jugar','Pulaia','f'],
-    ['Ayuda','Hilp','f'],
-    ['Saber','Nu','f'],
-    ['Trabajo','Wark','f']
+    ['Ayuda','Hilp','f']
   ]},
-  {id:'clase', nombre:'Frases de clase', ico:'✏️', nota:'Estas frases aún no tienen traducción revisada. Toca «✨ Sugerir con IA» o «✏️ Corregir» para escribirla, y «🎙️ Grabar» para que una persona miskita la diga.', frases:[
-    ['¿Necesitas ir al baño?','',''],
-    ['¿Tienes hambre?','',''],
-    ['¿Tienes sed?','',''],
-    ['Abre tu cuaderno','',''],
-    ['Siéntate, por favor','',''],
-    ['Escucha con atención','',''],
-    ['Muy bien, ¡excelente trabajo!','',''],
-    ['¿Entendiste?','',''],
-    ['Levanta la mano','',''],
-    ['Es hora de comer','',''],
-    ['Vamos al recreo','',''],
-    ['¿Te sientes bien?','',''],
-    ['Tu mamá viene por ti','',''],
-    ['Mañana nos vemos','','']
+  {id:'salud', nombre:'Higiene y salud', ico:'🧼', frases:[
+    ['Lavarse las manos','Mihtam sikbaia','mep'],
+    ['Cepillarse los dientes','Nampa kiauhbaia','mep'],
+    ['Bañarse todos los días','Yu bani aihtabaia','mep'],
+    ['Peinarse','Tamwa aubaia','mep'],
+    ['Cortarse las uñas','Amsmala klakaia','mep'],
+    ['Usar el uniforme limpio','Kul kualka klin dimaia','mep'],
+    ['Limpiarse los zapatos','Suskám klin briaia','mep'],
+    ['Fiebre','Rih ar rihka','mep'],
+    ['¿Tienes fiebre?','Rih brisma?','mep'],
+    ['Tos','Siahka','mep'],
+    ['¿Tienes tos?','Siahka brisma?','mep'],
+    ['Dolor','Latwan','mep'],
+    ['¿Te golpeaste?','Latwan briram?','mep'],
+    ['Dolor de cabeza','Lal klauhan','mep'],
+    ['¿Te duele la cabeza?','Lamla klahuisa?','mep'],
+    ['Diarrea','Biara sakan','mep'],
+    ['¿Tienes diarrea?','Biamra sakisa?','mep'],
+    ['Infección','Impiksan','mep'],
+    ['¿Tienes infección?','Impiksan brisma?','mep'],
+    ['Úlcera','Kluhka sukuan','mep'],
+    ['Enfermedad','Siknis','mep'],
+    ['¿Estás enfermo?','Siknis sma?','mep'],
+    ['Medicamentos','Sika','mep'],
+    ['¿Tomas medicamentos?','Sika disma?','mep'],
+    ['Pastillas','Pils','mep'],
+    ['Clínica','Klinik','mep'],
+    ['¿Fuiste a la clínica?','Klinik ra waram?','mep'],
+    ['Doctor','Daktar','mep'],
+    ['¿Fuiste al doctor?','Daktar ra waram?','mep'],
+    ['Enfermera','Nurs','mep'],
+    ['Dolor de muela','Napa klahuan','mep'],
+    ['¿Tienes dolor de muela?','Nampa klahuisa?','mep'],
+    ['Hospital','Haspital','mep']
+  ]},
+  {id:'emociones', nombre:'Emociones', ico:'💭', frases:[
+    ['Feliz','Lilia','mep'],
+    ['Triste','Sâri','mep'],
+    ['Enojado','Praut','mep'],
+    ['Sorprendido','Sirang iwan','mep'],
+    ['Miedo','Sibrin','mep'],
+    ['Preocupado','Diara luki','mep'],
+    ['Decepcionado','Kupia yamni apia','mep'],
+    ['Calmado / tranquilo','Sâp takan','mep'],
+    ['Frustrado','Mapara alki takaski ba','mep'],
+    ['Luisa está feliz','Luisa lilia sa','mep']
   ]},
   {id:'familia', nombre:'Familia y personas', ico:'👪', frases:[
-    ['Mamá','Yapti','f'],
-    ['Papá','Aisa','f'],
-    ['Abuela','Kuka','f'],
-    ['Abuelo','Dama','f'],
-    ['Nieto / nieta','Mula','f'],
+    ['Papá','Aisa','mep'],
+    ['Mamá','Yapti','mep'],
+    ['Hermano / hermana (mismo sexo)','Muihka','mep'],
+    ['Hermano / hermana (sexo contrario)','Laikra','mep'],
+    ['Bebé','Bibi','mep'],
+    ['Abuela','Kuka','mep'],
+    ['Abuelo','Dama','mep'],
+    ['Tía','Anti','mep'],
+    ['Tío','Tahti','mep'],
+    ['Tía paterna','Taihka','mep'],
+    ['Tío paterno','Rapia','mep'],
+    ['Yo','Yang','mep'],
+    ['Usted','Man','mep'],
+    ['Él / ella','Witin','mep'],
+    ['Nosotros / nosotras','Yang nani','mep'],
+    ['Ustedes','Man nani','mep'],
+    ['Ellos','Witin nani','mep'],
     ['Niño / niña','Tuktan','f'],
     ['Mujer','Mairin','f'],
-    ['Persona / gente','Upla','f'],
-    ['Yo','Yang','f'],
-    ['Tú','Man','f'],
-    ['Él / ella','Witin','f'],
-    ['Nosotros (todos)','Yawan','f']
+    ['Persona / gente','Upla','f']
+  ]},
+  {id:'cuerpo', nombre:'Cuerpo', ico:'🧍', frases:[
+    ['Cabeza','Lal','mep'],
+    ['Ojos','Nakra','mep'],
+    ['Oreja','Kiama','mep'],
+    ['Nariz','Kakma','mep'],
+    ['Boca','Bila','mep'],
+    ['Dientes','Napa','mep'],
+    ['Lengua','Tuisa','mep'],
+    ['Mejilla','Mawan buhnka','mep'],
+    ['Frente','Lal kamhka','mep'],
+    ['Mentón','Tauhka','mep'],
+    ['Barbilla','Krusa','mep'],
+    ['Cuello','Nana','mep'],
+    ['Pecho','Lamadusa','mep'],
+    ['Estómago','Biara','mep'],
+    ['Espalda','Nina dusa','mep'],
+    ['Brazo','Klahkla','mep'],
+    ['Mano','Mihta','mep'],
+    ['Dedo','Mihta kulkaika','mep'],
+    ['Pierna','Kuhma','mep'],
+    ['Pie','Mina','mep'],
+    ['Dedo del pie','Mina kulkaika','mep'],
+    ['Cerebro','Lal mabiarka','mep'],
+    ['Corazón','Kupia','mep'],
+    ['Pulmón','Pusa','mep'],
+    ['Hígado','Âuya','mep'],
+    ['Riñón','Kiskamka','mep'],
+    ['Vejiga','Iska watla','mep'],
+    ['Pelo','Tawa','f']
+  ]},
+  {id:'ropa', nombre:'Ropa', ico:'👕', frases:[
+    ['Camisa','Prak pura','mep'],
+    ['Blusa','Mairin praka pura','mep'],
+    ['Suéter','Prak pura twakni','mep'],
+    ['Camisa de manga larga','Prak klahkla yari','mep'],
+    ['Pantalón','Traus yari','mep'],
+    ['Pantalón de tela','Traus yari mina swapni','mep'],
+    ['Pantalón de mezclilla','Traus yari mina blujin','mep'],
+    ['Falda','Prak mahta','mep'],
+    ['Vestido','Prak ul','mep'],
+    ['Pantalón corto','Traus kuhku','mep'],
+    ['Calcetines / medias','Saks','mep'],
+    ['Pijama','Yapaia praka','mep'],
+    ['Gorra','Kiaput','mep'],
+    ['Pañuelo','Ansar','mep']
+  ]},
+  {id:'colores', nombre:'Colores', ico:'🎨', frases:[
+    ['Rojo','Pauni','mep'],
+    ['Amarillo','Lalahni','mep'],
+    ['Verde','Sangni','mep'],
+    ['Marrón / café','Puputni','mep'],
+    ['Blanco','Pihni','mep'],
+    ['Negro','Siksa','mep'],
+    ['Azul','Blu','mep'],
+    ['Rosado','Paura','mep'],
+    ['Gris','Pihitni','mep'],
+    ['Morado','Balianhta','mep'],
+    ['Anaranjado','Andris mapla','mep'],
+    ['La planta es verde','Dusa ba sangni sa','mep']
   ]},
   {id:'casa', nombre:'Casa y comida', ico:'🏠', frases:[
     ['Casa','Utla','f'],
     ['Cama','Krikri','f'],
     ['Hamaca','Silmika','f'],
-    ['Agua','Li','f'],
+    ['Agua','Lî','mep'],
     ['Comida','Plun','f'],
     ['Carne','Wina','f'],
     ['Pan','Brid','f'],
     ['Huevo','Mahbra','f'],
-    ['Fruta','Ma','f'],
+    ['Fruta','Mâ','f'],
     ['Plátano','Platu','f'],
     ['Mango','Mangu','f'],
     ['Aguacate','Sikia','f'],
     ['Papaya','Twas','f'],
     ['Pescado','Inska','f'],
-    ['Comer','Piaia','f'],
+    ['Dulce','Damni','mep'],
+    ['Amargo','Tahpla','mep'],
+    ['Ácido','Suahni','mep'],
+    ['Salado','Sal','mep'],
+    ['La fruta es dulce','Dusa mâ ba damni sa','mep'],
+    ['Comemos cosas calientes','Plun ba lapta pisa','mep'],
+    ['Comer','Piaia','mep'],
     ['Beber','Diaia','f'],
-    ['Dormir','Yapaia','f'],
+    ['Dormir','Yapaia','mep'],
     ['Dinero','Lalahka','f']
   ]},
-  {id:'animales', nombre:'Animales y naturaleza', ico:'🐢', frases:[
-    ['Animal','Daiwan','f'],
-    ['Perro','Yul','f'],
-    ['Gato','Pus','f'],
-    ['Caballo','Aras','f'],
-    ['Vaca','Bip','f'],
-    ['Cerdo','Kuirku','f'],
-    ['Gallina','Kalila','f'],
-    ['Venado','Sula','f'],
-    ['Conejo','Tibang','f'],
+  {id:'animales', nombre:'Animales', ico:'🐢', frases:[
+    ['Animal','Daiwan','mep'],
+    ['Cerdo / chancho','Kuirku','mep'],
+    ['Gallina','Kalila','mep'],
+    ['Gallo','Kalila waihka','mep'],
+    ['Perro','Yul','mep'],
+    ['Gato','Pûs','mep'],
+    ['Caballo','Âras','mep'],
+    ['Vaca','Bip','mep'],
+    ['Toro','Bip waihka','mep'],
+    ['Camello','Kiamil','mep'],
+    ['Cabra','Guts','mep'],
+    ['Burro','Biriku','mep'],
+    ['Tigre','Limi','mep'],
+    ['León','Layan','mep'],
+    ['Venado','Sula','mep'],
+    ['Oveja / cordero','Ship','mep'],
+    ['Lobo','Yulwail','mep'],
+    ['Zorro','Sikiski','mep'],
+    ['Nutria','Mamu','mep'],
+    ['Chancho de monte','Buksa','mep'],
+    ['Danto','Tilba','mep'],
+    ['Mono','Urus / ruskika','mep'],
+    ['Oso perezoso','Siwaiku','mep'],
+    ['Mono congo','Gung gung','mep'],
+    ['Ratón','Matis','mep'],
+    ['Águila','Yakal','mep'],
+    ['Zopilote','Usus','mep'],
+    ['Loro','Rahwa','mep'],
+    ['Oropéndola','Tulu','mep'],
+    ['Papagayo','Apu','mep'],
+    ['Búho','Iskri','mep'],
+    ['Pavo','Kusu','mep'],
     ['Tortuga de mar','Lih','f'],
     ['Serpiente','Pyuta','f'],
     ['Mariposa','Dildil','f'],
-    ['Mar','Kabu','f'],
+    ['Pescado','Inska','f']
+  ]},
+  {id:'naturaleza', nombre:'Naturaleza y clima', ico:'🌳', frases:[
+    ['Tierra','Tasba','mep'],
+    ['Aire','Pâsa','mep'],
+    ['Fuego','Pauta','mep'],
+    ['Sol','Yu lapta','mep'],
+    ['Lluvia','Li auhuan / pura laya','mep'],
+    ['Arcoíris','Kumadura','mep'],
+    ['Nublado','Klaut siksa','mep'],
+    ['Trueno','Alwani','mep'],
+    ['Relámpagos','Imyula','mep'],
+    ['Árbol','Dus','mep'],
+    ['Flor','Tangni','mep'],
+    ['Hoja','Dus wahia','mep'],
+    ['Rama','Tnawa','mep'],
+    ['Raíz','Wakia','mep'],
+    ['Pasto','Twi','mep'],
+    ['Río','Tingni','mep'],
+    ['Mar','Kabu','mep'],
+    ['Piedra','Walpa','mep'],
+    ['Arena','Auhya','mep'],
+    ['Montaña','Unta','mep'],
+    ['Cerro','Il','mep'],
+    ['Volcán','Pauta ilka','mep'],
+    ['Luna','Lati','mep'],
+    ['Nube','Kasbirka / klaut','mep'],
+    ['Verano','Mani','mep'],
+    ['Invierno (época lluviosa)','Lî piua','mep'],
+    ['Hace frío','Kauhla iwisa','mep'],
+    ['Ir a la playa','Auhya un ra waia sipsa','mep'],
+    ['Usamos ropa abrigada','Kuala tuakni dimisa','mep'],
+    ['El río es grande','Tingki ka ba tara sa','mep'],
+    ['La piedra es dura','Walpika ba karna sa','mep'],
     ['Bote','Duri','f']
   ]},
-  {id:'cuerpo', nombre:'Cuerpo', ico:'🧍', frases:[
-    ['Cabeza','Lal','f'],
-    ['Cara','Mawan','f'],
-    ['Ojo','Nakra','f'],
-    ['Oreja','Kyama','f'],
-    ['Nariz','Kakma','f'],
-    ['Boca','Bila','f'],
-    ['Diente','Napa','f'],
-    ['Lengua','Twisa','f'],
-    ['Mano','Mihta','f'],
-    ['Pie','Mina','f'],
-    ['Pelo','Tawa','f'],
-    ['Corazón','Kupia','f'],
-    ['Estómago','Klunghka','f']
+  {id:'tiempo', nombre:'Días y tiempo', ico:'📅', frases:[
+    ['Lunes','Mundi','mep'],
+    ['Martes','Susdi','mep'],
+    ['Miércoles','Winsdi','mep'],
+    ['Jueves','Tausdi','mep'],
+    ['Viernes','Praidi','mep'],
+    ['Sábado','Satadi','mep'],
+    ['Domingo','Sandi','mep'],
+    ['¿Qué día es hoy?','Naiwa ba dia yua sa?','mep'],
+    ['¿Qué día fue ayer?','Dia yua kan nahwala ba?','mep'],
+    ['¿Qué día será mañana?','Dia yua kaisa yauhka ba?','mep'],
+    ['¿Cuál es tu día favorito?','Ani yua ba kau laiksma?','mep'],
+    ['¿Cuántos días tiene una semana?','Wik ba an dis brisa?','mep'],
+    ['Hoy','Naiwa','mep'],
+    ['Ayer','Nahwala','mep'],
+    ['Mañana (el día siguiente)','Yauhka','mep'],
+    ['Antes','Kaina','mep'],
+    ['Ahora','Naha minit','mep'],
+    ['Después','Ninkara','mep'],
+    ['Día','Kakna','mep'],
+    ['Por la mañana','Titan','mep'],
+    ['Mediodía','Dinar','mep'],
+    ['Tarde','Tutni','mep'],
+    ['Noche','Tihmia','mep'],
+    ['Medianoche','Midil nait','mep'],
+    ['Amanecer','Ingwaia man','mep'],
+    ['Despertarse','Yapi buaia','mep'],
+    ['Orar','Wan pura sunaia','mep']
   ]},
-  {id:'numeros', nombre:'Números y palabras útiles', ico:'🔢', frases:[
+  {id:'numeros', nombre:'Números, formas y tamaños', ico:'🔷', frases:[
     ['Uno','Kumi','f'],
     ['Dos','Wal','f'],
-    ['Tres','Yumhpa','f'],
+    ['Tres','Yumhpa','mep'],
     ['Cuatro','Walhwal','f'],
     ['Cinco','Matsip','f'],
-    ['Grande','Tara','f'],
-    ['Pequeño','Sirpi','f'],
-    ['Blanco','Pihni','f'],
-    ['Negro','Siksa','f'],
-    ['Fuerte','Karna','f'],
-    ['Todos','Sut','f'],
-    ['Aquí','Naura','f'],
-    ['Ahora','Mahka','f'],
-    ['¿Qué?','Dia?','f'],
-    ['¿Quién?','Ya?','f'],
-    ['¿Dónde?','Anira?','f'],
-    ['¿Cómo?','Nahki?','f'],
-    ['¿Cuándo?','Ahkia?','f'],
-    ['¿Por qué?','Diakan?','f'],
-    ['Venir','Balaia','f'],
+    ['Muchos','Ailal','mep'],
+    ['Poco','Wiria','mep'],
+    ['Hay tres niños','Tuktan yumhpa bara sa','mep'],
+    ['Hay muchas flores','Tangni ailal sa','mep'],
+    ['Grande','Tara','mep'],
+    ['Mediano','Ninkara','mep'],
+    ['Pequeño','Sirpi','mep'],
+    ['El árbol es grande','Dûsa ba tara sa','mep'],
+    ['La bola es mediana','Bâl ka ba ninkara sa','mep'],
+    ['El ratón es pequeño','Matis ka ba sirpi sa','mep'],
+    ['Cuadrado','Tnaya walhwal','mep'],
+    ['Triángulo','Tnaya yumhpa','mep'],
+    ['Rectángulo','Tnaya wal yari, wal tanhta','mep'],
+    ['Círculo','Krukma','mep'],
+    ['Semicírculo','Bakrik krukma','mep'],
+    ['Pentágono','Tnaya matsip','mep'],
+    ['Hexágono','Tnaya matlalkahbi','mep'],
+    ['Octágono','Thaya it','mep'],
+    ['Rombo','Rumbu','mep']
+  ]},
+  {id:'describir', nombre:'Describir y ubicar', ico:'📍', frases:[
+    ['Encima / sobre','Purara','mep'],
+    ['Debajo','Munhtara','mep'],
+    ['Dentro','Bilara','mep'],
+    ['Fuera','Latara','mep'],
+    ['Delante / enfrente','Mawanra','mep'],
+    ['Detrás','Ninara','mep'],
+    ['Al lado / junto a','Tnayara','mep'],
+    ['Entre / en medio','Midilra / lilara','mep'],
+    ['El libro está sobre la mesa','Buk ba tibil purara sa','mep'],
+    ['La bola está debajo de la mesa','Bâl ba tibil munhtara sa','mep'],
+    ['El niño está sentado junto al árbol','Tuktika ba dus tnayara iwisa','mep'],
+    ['Este / esta','Naha','mep'],
+    ['Este árbol','Naha dusa','mep'],
+    ['Ese / esa','Baha','mep'],
+    ['Aquel / aquella','Bukra','mep'],
+    ['Aquella montaña','Bukra ilka ba','mep'],
+    ['Cerca','Lamara','mep'],
+    ['Lejos','Laihura','mep'],
+    ['Duro','Karna','mep'],
+    ['Suave','Suapni','mep'],
+    ['Áspero','Tramtrama','mep'],
+    ['Esponjoso','Puspusa','mep'],
+    ['Arrugado','Sriwan','mep'],
+    ['Granulado','Ma, ma','mep'],
+    ['Elástico','Dra, dra','mep'],
+    ['Liso','Lalalni','mep'],
+    ['Espinoso','Kiaikira','mep'],
+    ['Gordo','Batana','mep'],
+    ['Delgado','Biawan','mep'],
+    ['Bajo','Prahni','mep'],
+    ['Alto / largo','Yari','mep'],
+    ['Grueso','Tuahni','mep'],
+    ['Ligero','Tanta','mep'],
+    ['El pájaro es pequeño','Daiwa tnawira ba sirpi sa','mep']
+  ]},
+  {id:'verbos', nombre:'Verbos', ico:'🏃', nota:'Todos los verbos en miskito terminan en «aia». Para conjugarlos, usa el conjugador del «Diccionario».', frases:[
+    ['Venir','Balaia','mep'],
+    ['Ver','Kaikaia','mep'],
+    ['Decir','Wiaia','mep'],
+    ['Agarrar / tomar','Alkaia','mep'],
+    ['Dar','Yabaia','mep'],
+    ['Vivir / sentarse','Iwiaia','mep'],
+    ['Pensar','Lukaia','mep'],
+    ['Escribir','Ulbaia','mep'],
+    ['Hablar','Aisaia','mep'],
+    ['Cantar','Aiwanaia','mep'],
+    ['Salir','Takaia','mep'],
+    ['Entrar','Dimaia','mep'],
+    ['Caminar','Wapaia','mep'],
+    ['Dormir','Yapaia','mep'],
+    ['Escuchar','Walaia','mep'],
+    ['Jugar','Pulaia','mep'],
+    ['Lavar','Sikbaia','mep'],
+    ['Comer','Piaia','mep'],
+    ['Oler','Kia briaia','mep'],
+    ['Saborear','Dâbaia','mep'],
+    ['Tocar','Alkaia','mep'],
     ['Ir','Waia','f'],
-    ['Dar','Yabaia','f'],
-    ['Querer','Want','f']
+    ['Beber','Diaia','f'],
+    ['Aprender','Lan takaia','f']
   ]}
 ];
 
@@ -742,7 +1064,7 @@ function ir(id){
   seccionActual = id;
   window.scrollTo(0,0);
   if(id === 'frases') pintarFrases();
-  if(id === 'diccionario') pintarDiccionario();
+  if(id === 'diccionario'){ pintarDiccionario(); llenarVerbos(); }
   if(id === 'ajustes') pintarClave();
   if(id === 'imagenes') pintarImagenes();
 }
@@ -759,6 +1081,7 @@ function categoriasVisibles(){
   return cats;
 }
 function chipEstado(estado){
+  if(estado === 'mep') return '<span class="chip ok">Material MEP</span>';
   if(estado === 'f') return '<span class="chip ok">Fuente</span>';
   if(estado === 'r') return '<span class="chip ok">Revisada</span>';
   if(estado === 'ia') return '<span class="chip ia">IA aproximada</span>';
@@ -783,7 +1106,8 @@ function pintarFrases(){
         (f.mi ? '<div class="mi">'+esc(f.mi)+'</div>' : '<div class="mi vacia">Falta la traducción</div>')+
         '<div>'+chipEstado(f.mi ? f.estado : '')+(tiene?' <span class="chip ok">🎙️ Voz grabada</span>':'')+'</div>'+
         '<div class="acciones">'+
-          (f.mi ? '<button class="pill" data-acc="oir">🔊 Escuchar</button>' : '')+
+          (f.mi ? '<button class="pill" data-acc="oir">🔊 Miskito</button>' : '')+
+          '<button class="pill azul" data-acc="es">🗣️ Español</button>'+
           (!f.mi ? '<button class="pill morado" data-acc="ia">✨ Sugerir con IA</button>' : '')+
           '<button class="pill sec" data-acc="editar">✏️ Corregir</button>'+
           '<button class="pill coral" data-acc="grabar">🎙️ '+(tiene ? 'Grabar de nuevo' : 'Grabar')+'</button>'+
@@ -802,6 +1126,7 @@ document.getElementById('listaFrases').addEventListener('click', function(e){
   var f = todasLasFrases().find(function(x){ return x.id === id; });
   var acc = b.dataset.acc;
   if(acc === 'oir') escucharMiskito(id, f.mi);
+  if(acc === 'es') decir(f.es.replace(/…/g, ''), 'es-' + id);
   if(acc === 'grabar') alternarGrabacion(id, b);
   if(acc === 'editar') abrirEditor(tarjeta, f);
   if(acc === 'borrarvoz') confirmarBorrado(id, pintarFrases);
@@ -835,10 +1160,36 @@ function svg(c){ return '<svg viewBox="0 0 160 120" aria-hidden="true">' + c + '
 function corazon(x, y, s, color){
   return '<path transform="translate(' + x + ' ' + y + ') scale(' + s + ')" d="M0 -6 C0 -16 -16 -16 -16 -4 C-16 6 0 14 0 20 C0 14 16 6 16 -4 C16 -16 0 -16 0 -6Z" fill="' + color + '" ' + T + '/>';
 }
-function cara(boca, extra){
-  return '<circle cx="80" cy="60" r="44" fill="#ffd54f" ' + T + '/><circle cx="64" cy="50" r="5" fill="#3a3a3a"/><circle cx="96" cy="50" r="5" fill="#3a3a3a"/>' +
+function cara(boca, extra, fondo, ojosCerrados){
+  var ojos = ojosCerrados
+    ? '<path d="M56 52 q8 6 16 0 M88 52 q8 6 16 0" fill="none" ' + T + ' stroke-width="4"/>'
+    : '<circle cx="64" cy="50" r="5" fill="#3a3a3a"/><circle cx="96" cy="50" r="5" fill="#3a3a3a"/>';
+  return '<circle cx="80" cy="60" r="44" fill="' + (fondo || '#ffd54f') + '" ' + T + '/>' + ojos +
     '<path d="' + boca + '" fill="none" ' + T + ' stroke-width="5"/>' + (extra || '');
 }
+// Niño o niña sencillo; y = parte de arriba de la cabeza
+function nino(x, y, ropa, brazo){
+  var der = brazo === 'arriba' ? 'M' + (x+12) + ' ' + (y+34) + ' L' + (x+22) + ' ' + (y+4)
+          : brazo === 'adelante' ? 'M' + (x+12) + ' ' + (y+36) + ' L' + (x+36) + ' ' + (y+36)
+          : 'M' + (x+13) + ' ' + (y+34) + ' L' + (x+16) + ' ' + (y+56);
+  return '<path d="' + der + '" stroke="' + ropa + '" stroke-width="8" stroke-linecap="round"/>' +
+    (brazo === 'arriba' ? '<circle cx="' + (x+22) + '" cy="' + (y+2) + '" r="5" fill="#c98b5c" ' + T + ' stroke-width="2"/>' : '') +
+    '<path d="M' + (x-13) + ' ' + (y+34) + ' L' + (x-16) + ' ' + (y+56) + '" stroke="' + ropa + '" stroke-width="8" stroke-linecap="round"/>' +
+    '<path d="M' + (x-6) + ' ' + (y+60) + ' V' + (y+84) + ' M' + (x+6) + ' ' + (y+60) + ' V' + (y+84) + '" stroke="#34495e" stroke-width="8" stroke-linecap="round"/>' +
+    '<rect x="' + (x-14) + '" y="' + (y+26) + '" width="28" height="36" rx="10" fill="' + ropa + '" ' + T + '/>' +
+    '<circle cx="' + x + '" cy="' + (y+13) + '" r="12" fill="#c98b5c" ' + T + '/>' +
+    '<path d="M' + (x-12) + ' ' + (y+11) + ' Q' + x + ' ' + (y-7) + ' ' + (x+12) + ' ' + (y+11) + ' Q' + x + ' ' + (y+3) + ' ' + (x-12) + ' ' + (y+11) + 'Z" fill="#3b2a20"/>';
+}
+function burbuja(x, y, w, h, txt, color){
+  return '<path d="M' + (x+8) + ' ' + y + ' H' + (x+w-8) + ' Q' + (x+w) + ' ' + y + ' ' + (x+w) + ' ' + (y+8) + ' V' + (y+h-8) +
+    ' Q' + (x+w) + ' ' + (y+h) + ' ' + (x+w-8) + ' ' + (y+h) + ' H' + (x+26) + ' L' + (x+12) + ' ' + (y+h+10) + ' L' + (x+15) + ' ' + (y+h) +
+    ' H' + (x+8) + ' Q' + x + ' ' + (y+h) + ' ' + x + ' ' + (y+h-8) + ' V' + (y+8) + ' Q' + x + ' ' + y + ' ' + (x+8) + ' ' + y + 'Z" fill="#fff" ' + T + '/>' +
+    '<text x="' + (x + w/2) + '" y="' + (y + h/2 + (h > 40 ? 9 : 6)) + '" font-family="Arial" font-weight="800" font-size="' + (h > 40 ? 26 : 17) + '" text-anchor="middle" fill="' + color + '">' + txt + '</text>';
+}
+var CHECK = function(x, y){ return '<circle cx="' + x + '" cy="' + y + '" r="13" fill="#23874f"/><path d="M' + (x-6) + ' ' + y + ' l4 5 8 -9" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>'; };
+var EQUIS = function(x, y){ return '<circle cx="' + x + '" cy="' + y + '" r="13" fill="#c62828"/><path d="M' + (x-5) + ' ' + (y-5) + ' l10 10 M' + (x+5) + ' ' + (y-5) + ' l-10 10" stroke="#fff" stroke-width="4" stroke-linecap="round"/>'; };
+var CHISPAS = '<path d="M24 20 l4 10 10 4 -10 4 -4 10 -4 -10 -10 -4 10 -4z M136 16 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3z" fill="#e0a21b"/>';
+var PUPITRE = '<rect x="26" y="84" width="108" height="9" rx="3" fill="#a0522d" ' + T + '/><path d="M36 93 V116 M124 93 V116" ' + T + ' stroke-width="5"/>';
 var DIBUJOS = {
   bano: svg('<rect x="58" y="10" width="44" height="32" rx="6" fill="#bfe3ee" ' + T + '/><rect x="72" y="18" width="16" height="5" rx="2" fill="#3a3a3a"/>' +
     '<rect x="42" y="44" width="76" height="11" rx="5" fill="#e6f4f8" ' + T + '/><path d="M46 55 H114 Q112 84 86 88 L90 110 H70 L74 88 Q48 84 46 55Z" fill="#fff" ' + T + '/>'),
@@ -890,6 +1241,52 @@ var DIBUJOS = {
   hola: svg('<path d="M24 22 H136 Q146 22 146 32 V76 Q146 86 136 86 H72 L50 108 L54 86 H24 Q14 86 14 76 V32 Q14 22 24 22Z" fill="#fff" ' + T + '/>' +
     '<text x="80" y="64" font-family="Arial" font-weight="800" font-size="28" text-anchor="middle" fill="#0f7c8c">Naksa!</text>'),
   gracias: svg(corazon(80, 56, 3, '#e53935') + '<path d="M28 24 l4 10 10 4 -10 4 -4 10 -4 -10 -10 -4 10 -4z M132 20 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3z" fill="#e0a21b"/>'),
+  enojado: svg(cara('M62 88 Q80 74 98 88', '<path d="M52 36 L72 46 M108 36 L88 46" stroke="#3a3a3a" stroke-width="5" stroke-linecap="round"/>', '#ff9e80')),
+  miedo: svg(cara('M70 84 Q80 70 90 84 Q80 98 70 84Z', '<path d="M54 36 Q64 28 74 36 M86 36 Q96 28 106 36" fill="none" stroke="#3a3a3a" stroke-width="4" stroke-linecap="round"/>', '#ffe9a8')),
+  calmado: svg(cara('M64 76 Q80 88 96 76', '', '#b2dfdb', true)),
+  fiebre: svg('<rect x="68" y="12" width="24" height="76" rx="12" fill="#fff" ' + T + '/><rect x="75" y="28" width="10" height="66" rx="4" fill="#e53935"/>' +
+    '<circle cx="80" cy="98" r="16" fill="#e53935" ' + T + '/><path d="M92 30 H86 M92 44 H86 M92 58 H86" ' + T + ' stroke-width="2"/>' +
+    '<path d="M28 40 q8 10 0 20 q-8 10 0 20 M132 40 q8 10 0 20 q-8 10 0 20" fill="none" stroke="#ff7043" stroke-width="4" stroke-linecap="round"/>'),
+  dientes: svg('<path d="M30 38 Q30 18 50 18 Q60 18 64 25 Q68 18 78 18 Q98 18 98 38 Q98 60 90 74 Q86 102 78 102 Q72 102 70 84 Q66 74 62 84 Q60 102 54 102 Q46 102 42 74 Q30 60 30 38Z" fill="#fff" ' + T + '/>' +
+    '<g transform="rotate(25 128 62)"><rect x="122" y="30" width="12" height="84" rx="6" fill="#2f62d9" ' + T + '/><rect x="118" y="10" width="20" height="24" rx="3" fill="#e6f4f8" ' + T + '/></g>' + CHISPAS),
+  banarse: svg('<path d="M24 14 H96 V28" fill="none" ' + T + ' stroke-width="6"/><path d="M76 28 H116 L108 42 H84 Z" fill="#9aa4ad" ' + T + '/>' +
+    '<path d="M88 52 v8 M96 50 v12 M104 52 v8 M92 70 v8 M100 68 v10" stroke="#5bb8de" stroke-width="4" stroke-linecap="round"/>' +
+    '<path d="M18 84 H142 Q138 114 80 114 Q22 114 18 84Z" fill="#eaf6fb" ' + T + '/>' +
+    '<circle cx="46" cy="80" r="9" fill="#fff" stroke="#9fd3e6" stroke-width="2"/><circle cx="62" cy="74" r="7" fill="#fff" stroke="#9fd3e6" stroke-width="2"/><circle cx="120" cy="78" r="8" fill="#fff" stroke="#9fd3e6" stroke-width="2"/>'),
+  lapiz: svg('<g transform="rotate(-28 80 60)"><rect x="34" y="48" width="84" height="24" fill="#f6c343" ' + T + '/><path d="M118 48 L146 60 L118 72Z" fill="#f3d9a4" ' + T + '/>' +
+    '<path d="M138 56 L146 60 L138 64Z" fill="#3a3a3a"/><rect x="18" y="48" width="16" height="24" rx="4" fill="#e57373" ' + T + '/></g>'),
+  cuaderno: svg('<rect x="44" y="12" width="78" height="98" rx="6" fill="#2f62d9" ' + T + '/><rect x="60" y="30" width="48" height="18" rx="3" fill="#fff"/>' +
+    '<path d="M64 36 H104 M64 42 H94" stroke="#9aa4ad" stroke-width="2"/>' +
+    '<path d="M38 24 h12 M38 40 h12 M38 56 h12 M38 72 h12 M38 88 h12" stroke="#3a3a3a" stroke-width="4" stroke-linecap="round"/>'),
+  comedor: svg('<rect x="16" y="58" width="128" height="10" rx="3" fill="#a0522d" ' + T + '/><path d="M28 68 V112 M132 68 V112" ' + T + ' stroke-width="6"/>' +
+    '<ellipse cx="54" cy="52" rx="22" ry="7" fill="#fff" ' + T + '/><ellipse cx="106" cy="52" rx="22" ry="7" fill="#fff" ' + T + '/>' +
+    '<circle cx="50" cy="48" r="5" fill="#7a3e22"/><circle cx="58" cy="48" r="5" fill="#f2f2f2" stroke="#ccc"/><circle cx="104" cy="48" r="6" fill="#f6a623"/>' +
+    '<rect x="74" y="34" width="12" height="18" rx="2" fill="#bfe3ee" ' + T + ' stroke-width="2"/>'),
+  porfavor: svg(burbuja(24, 30, 112, 56, 'Plis', '#23874f') + CHISPAS),
+  adios: svg(burbuja(24, 30, 112, 56, 'Aisabi', '#7d4cc4') + '<path d="M128 100 q8 -10 0 -20 M138 104 q12 -14 0 -28" fill="none" stroke="#e0a21b" stroke-width="4" stroke-linecap="round"/>'),
+  // Normas de clase
+  norma1: svg(nino(80, 10, '#5c8de0', 'arriba') + PUPITRE + '<rect x="42" y="76" width="30" height="8" rx="2" fill="#fff" ' + T + ' stroke-width="2"/>'),
+  norma2: svg('<path d="M58 22 Q96 14 100 50 Q102 70 86 80 Q78 86 80 98 Q78 110 64 106" fill="#c98b5c" ' + T + '/><path d="M70 40 Q86 36 86 54 Q86 62 76 64" fill="none" ' + T + '/>' +
+    '<path d="M114 42 Q124 60 114 78 M126 32 Q142 60 126 88" fill="none" stroke="#2f62d9" stroke-width="5" stroke-linecap="round"/>'),
+  norma3: svg(burbuja(8, 8, 66, 30, 'Plis', '#23874f') + burbuja(86, 40, 68, 30, 'Tingki', '#c4502a') + burbuja(10, 76, 76, 30, 'Iskius', '#2f62d9')),
+  norma4: svg(nino(48, 22, '#e57373', 'abajo') + nino(112, 16, '#7d4cc4', 'abajo') + corazon(80, 22, 0.9, '#e53935')),
+  norma5: svg(PUPITRE + '<rect x="40" y="62" width="40" height="10" fill="#e57373" ' + T + ' stroke-width="2"/><rect x="44" y="52" width="34" height="10" fill="#2f62d9" ' + T + ' stroke-width="2"/>' +
+    '<rect x="96" y="58" width="16" height="26" rx="3" fill="#4caf50" ' + T + ' stroke-width="2"/><path d="M100 58 V44 M106 58 V40" stroke="#f6c343" stroke-width="4" stroke-linecap="round"/>' + CHISPAS),
+  norma6: svg(nino(46, 18, '#4f9d69', 'abajo') + CHECK(46, 112 - 2) + '<g transform="rotate(18 114 60)">' + nino(114, 18, '#e0a21b', 'adelante') + '</g>' + EQUIS(124, 110) +
+    '<path d="M136 40 h12 M134 52 h14" stroke="#9aa4ad" stroke-width="3" stroke-linecap="round"/>'),
+  norma7: svg('<circle cx="58" cy="58" r="40" fill="#fff" ' + T + '/><path d="M58 58 V32 M58 58 L76 66" ' + T + ' stroke-width="5"/>' +
+    '<path d="M58 22 v6 M58 88 v6 M22 58 h6 M88 58 h6" ' + T + '/>' +
+    '<rect x="106" y="64" width="44" height="44" fill="#f6e3b4" ' + T + '/><path d="M100 66 L128 44 L156 66Z" fill="#2f62d9" ' + T + '/><rect x="122" y="86" width="12" height="22" fill="#8d5a33" ' + T + ' stroke-width="2"/>'),
+  norma8: svg('<rect x="70" y="14" width="84" height="64" rx="4" fill="#2e7d5b" ' + T + '/>' +
+    '<path d="M82 32 l5 5 9 -10 M82 50 l5 5 9 -10 M82 68 l5 5 9 -10" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>' +
+    '<path d="M104 32 H142 M104 50 H142 M104 68 H134" stroke="#fff" stroke-width="3" stroke-linecap="round"/>' + nino(34, 20, '#7d4cc4', 'adelante')),
+  norma9: svg('<path d="M24 16 H68 L50 60 L68 104 H24 L42 60 Z" fill="#fff8e1" ' + T + '/><path d="M32 26 H60 L46 52Z M46 76 L62 98 H30Z" fill="#f6c343"/>' +
+    nino(112, 18, '#5c8de0', 'arriba')),
+  norma10: svg('<path d="M48 40 V108 M48 76 H112 V108 M112 76 V40" fill="none" stroke="#a0522d" stroke-width="7" stroke-linecap="round"/>' +
+    nino(80, 6, '#e0a21b', 'abajo') + '<rect x="44" y="70" width="72" height="8" rx="3" fill="#a0522d"/>' + CHECK(136, 22)),
+  norma11: svg('<path d="M52 56 H112 L104 112 H60 Z" fill="#4caf50" ' + T + '/><rect x="46" y="46" width="72" height="12" rx="4" fill="#388e3c" ' + T + '/>' +
+    '<path d="M70 70 V100 M82 70 V100 M94 70 V100" stroke="#2e7d32" stroke-width="4" stroke-linecap="round"/>' +
+    '<circle cx="82" cy="16" r="10" fill="#fff" ' + T + '/><path d="M82 28 V40 M76 34 l6 7 6 -7" fill="none" stroke="#c4502a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>'),
   si: svg('<circle cx="80" cy="60" r="46" fill="#23874f"/><path d="M56 62 L74 80 L106 42" fill="none" stroke="#fff" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>'),
   no: svg('<circle cx="80" cy="60" r="46" fill="#c62828"/><path d="M60 40 L100 80 M100 40 L60 80" stroke="#fff" stroke-width="13" stroke-linecap="round"/>')
 };
@@ -897,37 +1294,61 @@ var DIBUJOS = {
 // es: frase en español · clave: palabra en español · mi: palabra en miskito · pr: pronunciación (sílaba fuerte en mayúsculas)
 var IMAGENES = [
   {g:'Lo que necesito', items:[
-    {id:'bano', es:'Necesito ir al baño', clave:'Baño', mi:'', pr:'', estado:''},
-    {id:'agua', es:'Tengo sed, quiero agua', clave:'Agua', mi:'Li', pr:'LI', estado:'f'},
+    {id:'bano', es:'Necesito ir al baño', clave:'Baño', mi:'Tailit', pr:'TAI-lit', estado:'mep'},
+    {id:'agua', es:'Tengo sed, quiero agua', clave:'Agua', mi:'Lî', pr:'LI', estado:'mep'},
     {id:'comer', es:'Tengo hambre, quiero comer', clave:'Comida', mi:'Plun', pr:'PLUN', estado:'f'},
-    {id:'fruta', es:'Quiero una fruta', clave:'Fruta', mi:'Ma', pr:'MA', estado:'f'},
-    {id:'dormir', es:'Tengo sueño, quiero dormir', clave:'Dormir', mi:'Yapaia', pr:'YA-pa-ia', estado:'f'},
-    {id:'lavar', es:'Me lavo las manos', clave:'Mano', mi:'Mihta', pr:'MIH-ta', estado:'f'},
+    {id:'fruta', es:'Quiero una fruta', clave:'Fruta', mi:'Mâ', pr:'MA', estado:'f'},
+    {id:'dormir', es:'Tengo sueño, quiero dormir', clave:'Dormir', mi:'Yapaia', pr:'YA-pa-ia', estado:'mep'},
     {id:'ayuda', es:'Necesito ayuda', clave:'Ayuda', mi:'Hilp', pr:'JILP', estado:'f'}
   ]},
-  {g:'Me duele', items:[
-    {id:'cabeza', es:'Me duele la cabeza', clave:'Cabeza', mi:'Lal', pr:'LAL', estado:'f'},
-    {id:'estomago', es:'Me duele el estómago', clave:'Estómago', mi:'Klunghka', pr:'KLUNG-ka', estado:'f'}
+  {g:'Higiene y salud', items:[
+    {id:'lavar', es:'Lávate las manos', clave:'Lavarse las manos', mi:'Mihtam sikbaia', pr:'MIH-tam SIK-baia', estado:'mep'},
+    {id:'dientes', es:'Cepíllate los dientes', clave:'Cepillarse los dientes', mi:'Nampa kiauhbaia', pr:'NAM-pa KIAU-baia', estado:'mep'},
+    {id:'banarse', es:'Báñate todos los días', clave:'Bañarse todos los días', mi:'Yu bani aihtabaia', pr:'YU BA-ni AI-ta-baia', estado:'mep'},
+    {id:'cabeza', es:'Me duele la cabeza', clave:'Dolor de cabeza', mi:'Lal klauhan', pr:'LAL KLAU-jan', estado:'mep'},
+    {id:'estomago', es:'Me duele el estómago', clave:'Estómago', mi:'Biara', pr:'BIA-ra', estado:'mep'},
+    {id:'fiebre', es:'¿Tienes fiebre?', clave:'', mi:'Rih brisma?', pr:'RIJ BRIS-ma', estado:'mep'}
   ]},
   {g:'Cómo me siento', items:[
-    {id:'feliz', es:'Estoy feliz', clave:'Feliz', mi:'', pr:'', estado:''},
-    {id:'triste', es:'Estoy triste', clave:'Triste', mi:'', pr:'', estado:''}
+    {id:'feliz', es:'Estoy feliz', clave:'Feliz', mi:'Lilia', pr:'LI-lia', estado:'mep'},
+    {id:'triste', es:'Estoy triste', clave:'Triste', mi:'Sâri', pr:'SAA-ri', estado:'mep'},
+    {id:'enojado', es:'Estoy enojado', clave:'Enojado', mi:'Praut', pr:'PRAUT', estado:'mep'},
+    {id:'miedo', es:'Tengo miedo', clave:'Miedo', mi:'Sibrin', pr:'SI-brin', estado:'mep'},
+    {id:'calmado', es:'Estoy tranquila', clave:'Calmado / tranquilo', mi:'Sâp takan', pr:'SAAP TA-kan', estado:'mep'}
+  ]},
+  {g:'Normas de clase', items:[
+    {id:'norma1', es:'Levanta la mano para hablar o participar', clave:'', mi:'Mihtam bukaia sturi aisaia wantsma pyuara', pr:'', estado:'mep'},
+    {id:'norma2', es:'Escucha con atención cuando otras personas hablan', clave:'', mi:'Sap walaia upla kum sturi aisi pyuara', pr:'', estado:'mep'},
+    {id:'norma3', es:'Usa palabras amables como por favor, gracias y permiso', clave:'', mi:'Sturi yamni nani yus muns aisisma pyuara: plis, tingki an iskius', pr:'', estado:'mep'},
+    {id:'norma4', es:'Respeta a tus compañeros y a tu docente', clave:'', mi:'Rispik munaia pamnika an maistrukam ra', pr:'', estado:'mep'},
+    {id:'norma5', es:'Mantén tu espacio limpio y ordenado', clave:'', mi:'Iwisma pliska ba wapni an klin briaia', pr:'', estado:'mep'},
+    {id:'norma6', es:'Camina dentro del aula; no corras', clave:'', mi:'Klas bilara wapi taukaia, palaia apia', pr:'', estado:'mep'},
+    {id:'norma7', es:'Puntualidad y asistencia', clave:'', mi:'Kul dakbaia apia an sun balaia', pr:'', estado:'mep'},
+    {id:'norma8', es:'Sigue las instrucciones del docente', clave:'', mi:'Maistrukam dia mai wiba bila walaia', pr:'', estado:'mep'},
+    {id:'norma9', es:'Espera tu turno para hablar', clave:'', mi:'Bila kaiks man taim aisaia pyuara', pr:'', estado:'mep'},
+    {id:'norma10', es:'Permanece sentado cuando sea necesario', clave:'', mi:'Pliskam ar sir kam ra iwi bas', pr:'', estado:'mep'},
+    {id:'norma11', es:'Deposita la basura en su lugar', clave:'', mi:'Dipasta ba pliskara mangks', pr:'', estado:'mep'}
   ]},
   {g:'Mi familia y mis lugares', items:[
-    {id:'mama', es:'Quiero a mi mamá', clave:'Mamá', mi:'Yapti', pr:'YAP-ti', estado:'f'},
-    {id:'papa', es:'Mi papá', clave:'Papá', mi:'Aisa', pr:'AI-sa', estado:'f'},
+    {id:'mama', es:'Quiero a mi mamá', clave:'Mamá', mi:'Yapti', pr:'YAP-ti', estado:'mep'},
+    {id:'papa', es:'Mi papá', clave:'Papá', mi:'Aisa', pr:'AI-sa', estado:'mep'},
     {id:'casa', es:'Quiero ir a mi casa', clave:'Casa', mi:'Utla', pr:'UT-la', estado:'f'},
-    {id:'escuela', es:'Vamos a la escuela', clave:'Escuela', mi:'Skul', pr:'ES-kul', estado:'f'}
+    {id:'escuela', es:'Vamos a la escuela', clave:'Escuela', mi:'Skul watla', pr:'SKUL UAT-la', estado:'mep'},
+    {id:'comedor', es:'Voy al comedor', clave:'', mi:'Plun piaia pliska ra auna', pr:'PLUN PI-aia PLIS-ka ra AU-na', estado:'mep'}
   ]},
   {g:'En la escuela', items:[
-    {id:'libro', es:'Vamos a leer un libro', clave:'Libro', mi:'Buk', pr:'BUK', estado:'f'},
-    {id:'jugar', es:'Vamos a jugar', clave:'Jugar', mi:'Pulaia', pr:'PU-la-ia', estado:'f'}
+    {id:'libro', es:'Vamos a leer un libro', clave:'Libro', mi:'Buk', pr:'BUK', estado:'mep'},
+    {id:'lapiz', es:'Mi lápiz', clave:'Lápiz', mi:'Pinsil', pr:'PIN-sil', estado:'mep'},
+    {id:'cuaderno', es:'Abre tu cuaderno', clave:'Cuaderno', mi:'Ulbaia wauhtaika', pr:'UL-baia UAU-taika', estado:'mep'},
+    {id:'jugar', es:'Vamos a jugar', clave:'Jugar', mi:'Pulaia', pr:'PU-la-ia', estado:'mep'}
   ]},
   {g:'Para responder', items:[
-    {id:'hola', es:'Hola', clave:'Hola', mi:'Naksa', pr:'NAK-sa', estado:'f'},
-    {id:'gracias', es:'Gracias', clave:'Gracias', mi:'Tingki', pr:'TING-ki', estado:'v'},
-    {id:'si', es:'Sí', clave:'Sí', mi:'Au', pr:'AU', estado:'f'},
-    {id:'no', es:'No', clave:'No', mi:'Apia', pr:'A-pia', estado:'f'}
+    {id:'hola', es:'Hola', clave:'', mi:'Naksa', pr:'NAK-sa', estado:'mep'},
+    {id:'porfavor', es:'Por favor', clave:'', mi:'Du pali / plis', pr:'DU PA-li / PLIS', estado:'mep'},
+    {id:'gracias', es:'Gracias', clave:'', mi:'Tingki', pr:'TING-ki', estado:'mep'},
+    {id:'adios', es:'Adiós', clave:'', mi:'Aisabi', pr:'AI-sa-bi', estado:'mep'},
+    {id:'si', es:'Sí', clave:'', mi:'Au', pr:'AU', estado:'mep'},
+    {id:'no', es:'No', clave:'', mi:'Apia', pr:'A-pia', estado:'mep'}
   ]}
 ];
 // Aplica las correcciones guardadas (una frase completa reemplaza la palabra)
@@ -955,10 +1376,11 @@ function pintarImagenes(){
               (im.mi ? '<div class="mi">' + esc(im.mi) + '</div>' : '<div class="mi vacia">Falta la palabra en miskito</div>') +
               (im.pr ? '<div class="pron">Se dice: <b>' + esc(im.pr) + '</b></div>' : '') +
               '<div class="es">' + esc(im.es) + '</div>' +
-              '<div class="clave">' + (im.mi && !im.frase ? esc(im.clave) + ' = ' + esc(im.mi) + ' · ' : '') + chipEstado(im.mi ? im.estado : '') +
+              '<div class="clave">' + (im.mi && !im.frase && im.clave ? esc(im.clave) + ' = ' + esc(im.mi) + ' · ' : '') + chipEstado(im.mi ? im.estado : '') +
                 (tiene ? ' <span class="chip ok">🎙️ Voz grabada</span>' : '') + '</div>' +
               '<div class="acciones">' +
-                '<button class="pill azul" data-acc="es">🗣️ En español</button>' +
+                (im.mi ? '<button class="pill" data-acc="oir">🔊 Miskito</button>' : '') +
+                '<button class="pill azul" data-acc="es">🗣️ Español</button>' +
                 (!im.mi ? '<button class="pill morado" data-acc="ia">✨ Sugerir con IA</button>' : '') +
                 '<button class="pill sec" data-acc="editar">✏️ Corregir</button>' +
                 '<button class="pill coral" data-acc="grabar">🎙️ ' + (tiene ? 'Grabar de nuevo' : 'Grabar') + '</button>' +
@@ -995,14 +1417,58 @@ function pintarDiccionario(){
     .sort(function(a,b){ return a.es.localeCompare(b.es,'es'); });
   document.getElementById('tablaDic').innerHTML = filas.length ? filas.map(function(f){
     return '<tr><td>'+esc(f.es)+'</td><td class="mi">'+esc(f.mi)+' '+chipEstado(f.estado)+'</td>'+
-      '<td><button class="pill chico" data-oir="'+f.id+'" aria-label="Escuchar '+esc(f.mi)+'">🔊</button></td></tr>';
+      '<td style="white-space:nowrap"><button class="pill chico" data-oir="'+f.id+'" aria-label="Escuchar en miskito: '+esc(f.mi)+'" title="Miskito">🔊</button> '+
+      '<button class="pill chico azul" data-oires="'+f.id+'" aria-label="Escuchar en español: '+esc(f.es)+'" title="Español">🗣️</button></td></tr>';
   }).join('') : '<tr><td colspan="3">No se encontró esa palabra.</td></tr>';
 }
 document.getElementById('buscar').addEventListener('input', pintarDiccionario);
 document.getElementById('tablaDic').addEventListener('click', function(e){
-  var b = e.target.closest('[data-oir]'); if(!b) return;
-  var f = todasLasFrases().find(function(x){ return x.id === b.dataset.oir; });
-  if(f) escucharMiskito(f.id, f.mi);
+  var b = e.target.closest('[data-oir],[data-oires]'); if(!b) return;
+  var id = b.dataset.oir || b.dataset.oires;
+  var f = todasLasFrases().find(function(x){ return x.id === id; });
+  if(!f) return;
+  if(b.dataset.oir) escucharMiskito(f.id, f.mi); else decir(f.es.replace(/…/g, ''), 'es-' + f.id);
+});
+
+/* ---------- Conjugador (regla del material MEP) ---------- */
+var TERMINACIONES = {
+  pasado:   ['ri','ram','an'],
+  presente: ['isna','isma','isa'],
+  futuro:   ['amna','ma','bia']
+};
+function conjugar(verbo, tiempo, persona){
+  var v = verbo.toLowerCase();
+  return (v.replace(/aia$/, '') + TERMINACIONES[tiempo][persona]).replace(/ii/g, 'i');
+}
+function verbosConjugables(){
+  var vistos = {}, lista = [];
+  todasLasFrases().forEach(function(f){
+    if(f.mi && /aia$/i.test(f.mi) && !vistos[f.mi.toLowerCase()]){
+      vistos[f.mi.toLowerCase()] = true; lista.push(f);
+    }
+  });
+  return lista.sort(function(a,b){ return a.es.localeCompare(b.es,'es'); });
+}
+var selVerbo = document.getElementById('selVerbo');
+function llenarVerbos(){
+  if(selVerbo.options.length) return;
+  selVerbo.innerHTML = verbosConjugables().map(function(f){
+    return '<option value="' + esc(f.mi) + '"' + (f.mi === 'Piaia' ? ' selected' : '') + '>' + esc(f.es) + ' — ' + esc(f.mi) + '</option>';
+  }).join('');
+  pintarConjugacion();
+}
+function pintarConjugacion(){
+  var v = selVerbo.value, filas = ['Yo (yang)','Usted (man)','Él / ella (witin)'];
+  document.getElementById('tablaConj').innerHTML = filas.map(function(nombre, p){
+    return '<tr><th>' + nombre + '</th>' + ['pasado','presente','futuro'].map(function(t){
+      var forma = conjugar(v, t, p);
+      return '<td class="verbo"><button class="pill sec chico" data-forma="' + esc(forma) + '" aria-label="Escuchar ' + esc(forma) + '">' + esc(forma) + '</button></td>';
+    }).join('') + '</tr>';
+  }).join('');
+}
+selVerbo.addEventListener('change', pintarConjugacion);
+document.getElementById('tablaConj').addEventListener('click', function(e){
+  var b = e.target.closest('[data-forma]'); if(b) decir(paraVoz(b.dataset.forma), 'conj-' + b.dataset.forma);
 });
 
 /* ---------- Reconocimiento de voz ---------- */
@@ -1072,14 +1538,20 @@ function palabraPorPalabra(es){
     var f = null;
     if(raiz.length < 2) candidatos = candidatos.slice(0,4);
     for(var i=0;i<candidatos.length && !f;i++){ if(candidatos[i].length > 1) f = idx[candidatos[i]] || null; }
-    return {es:w, f:f, vacia: VACIAS.indexOf(w) >= 0};
+    // Verbo conjugado en presente (como → pisna, comes → pisma, come → pisa)
+    var mi = f ? f.mi : '';
+    if(f && /aia$/i.test(f.mi) && f.mi.indexOf(' ') < 0 && !/(ar|er|ir)$/.test(w)){
+      var persona = /o$/.test(w) ? 0 : /(as|es)$/.test(w) ? 1 : /(a|e)$/.test(w) ? 2 : -1;
+      if(persona >= 0) mi = conjugar(f.mi, 'presente', persona);
+    }
+    return {es:w, f:f, mi:mi, vacia: VACIAS.indexOf(w) >= 0};
   });
 }
 
 function claveApi(){ return leer('mq_clave', ''); }
 
 function glosario(){
-  return todasLasFrases().filter(function(f){ return f.mi && (f.estado === 'f' || f.estado === 'r'); })
+  return todasLasFrases().filter(function(f){ return f.mi && (f.estado === 'mep' || f.estado === 'f' || f.estado === 'r'); })
     .map(function(f){ return f.es + ' = ' + f.mi; }).join('\n');
 }
 
@@ -1090,7 +1562,9 @@ var SISTEMA = [
   '- No traduzcas palabra por palabra: adapta la idea a cómo la diría naturalmente una persona miskita, con palabras sencillas para una niña.',
   '- El miskito pone el verbo al final (sujeto-objeto-verbo) y usa posposiciones (ra, wal, wina, kat).',
   '- Usa la ortografía nicaragüense habitual: vocales a, i, u (y e, o solo en préstamos), vocales largas con circunflejo (â, î, û) cuando corresponda.',
-  '- Prefiere el vocabulario del glosario verificado que se te da. Basate en el Diccionario Miskito-Español de Heath y Marx y en el uso actual de Nicaragua.',
+  '- Usa siempre el vocabulario y las frases del glosario verificado que se te da: viene sobre todo del «Material de apoyo bilingüe miskito-español» del Ministerio de Educación Pública de Costa Rica, escrito por una docente de lengua miskita, y tiene prioridad sobre cualquier otra fuente. Para lo que no esté ahí, básate en el Diccionario Miskito-Español de Heath y Marx y en el uso actual de Nicaragua.',
+  '- Conjugación (regla del material MEP): la raíz es el verbo sin «aia» (piaia → pi) y se le agrega la terminación. Pasado: yang -ri, man -ram, witin -an. Presente: yang -isna, man -isma, witin -isa. Futuro: yang -amna, man -ma, witin -bia. Ejemplo con piaia (comer): piri, piram, pian; pisna, pisma, pisa; piamna, pima, pibia.',
+  '- Para decir «es / está» se termina la oración con «sa»: «Dûsa ba tara sa» (el árbol es grande), «Buk ba tibil purara sa» (el libro está sobre la mesa). «ba» marca lo que ya se nombró. «nani» forma el plural (yang nani, witin nani).',
   '- Si no conoces una palabra con seguridad, usa el préstamo del inglés criollo o del español que usan los hablantes, y dilo en las notas.',
   '- Sé honesto sobre tu seguridad: el miskito tiene pocos textos digitales.',
   'Devuelve solo JSON con: miskito (la traducción), retro_espanol (qué dice tu traducción, de vuelta al español, literal), notas (breve, en español, para la docente: palabras dudosas o adaptaciones), confianza ("alta", "media" o "baja").'
@@ -1161,7 +1635,7 @@ function mostrarResultado(r){
   document.getElementById('resRetro').innerHTML = r.retro ? '<b>Dice:</b> ' + esc(r.retro) : '';
   document.getElementById('resNota').textContent = r.nota || '';
   document.getElementById('resPalabras').innerHTML = (r.palabras || []).map(function(p){
-    return p.f ? '<span class="palabra">'+esc(p.es)+' → <b>'+esc(p.f.mi)+'</b></span>'
+    return p.f ? '<span class="palabra">'+esc(p.es)+' → <b>'+esc(p.mi)+'</b></span>'
                : '<span class="palabra falta">'+esc(p.es)+' → ?</span>';
   }).join('');
   document.getElementById('btnEscucharMi').disabled = !r.mi;
@@ -1200,7 +1674,7 @@ function traducir(){
 }
 function porPalabras(es){
   var pal = palabraPorPalabra(es).filter(function(p){ return !p.vacia || p.f; });
-  var mi = pal.filter(function(p){ return p.f; }).map(function(p){ return p.f.mi.replace(/[?…]/g,''); }).join(' ');
+  var mi = pal.filter(function(p){ return p.f; }).map(function(p){ return p.mi.replace(/[?…]/g,''); }).join(' ');
   mostrarResultado({es:es, mi:mi, estado:'v', origen:'Diccionario, palabra por palabra',
     nota: mi ? 'Solo se tradujeron las palabras conocidas; el orden puede no ser el correcto en miskito.' : 'No se encontraron palabras conocidas.',
     palabras: pal, id: idFrase(es)});
@@ -1208,6 +1682,7 @@ function porPalabras(es){
 document.getElementById('btnTraducir').addEventListener('click', traducir);
 txtEs.addEventListener('keydown', function(e){ if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); traducir(); } });
 document.getElementById('btnEscucharMi').addEventListener('click', function(){ if(ultimo) escucharMiskito(ultimo.id, ultimo.mi); });
+document.getElementById('btnEscucharEs').addEventListener('click', function(){ if(ultimo) decir(ultimo.es, 'es-traducir'); });
 document.getElementById('btnGuardarFrase').addEventListener('click', function(){
   if(!ultimo || !ultimo.mi) return;
   if(!misFrases.some(function(f){ return idFrase(f.es) === idFrase(ultimo.es); })){
@@ -1387,7 +1862,7 @@ document.getElementById('btnTraducirDoc').addEventListener('click', function(){
 });
 function traducirDocPorPalabras(texto){
   var parrafos = texto.split(/\n\s*\n|\n/).map(function(s){ return s.trim(); }).filter(Boolean).map(function(es){
-    var mi = palabraPorPalabra(es).filter(function(p){ return p.f; }).map(function(p){ return p.f.mi.replace(/[?…]/g,''); }).join(' ');
+    var mi = palabraPorPalabra(es).filter(function(p){ return p.f; }).map(function(p){ return p.mi.replace(/[?…]/g,''); }).join(' ');
     return {espanol:es, miskito:mi};
   });
   estadoDoc.textContent = 'Sin clave de IA: se tradujo palabra por palabra.';
@@ -1402,12 +1877,18 @@ function mostrarDoc(r){
   document.getElementById('docParrafos').innerHTML = r.parrafos.map(function(p, i){
     return '<div class="parrafo"><div class="es">' + esc(p.espanol) + '</div>' +
       '<div class="mi">' + (p.miskito ? esc(p.miskito) : '—') + '</div>' +
-      (p.miskito ? '<button class="pill chico" data-parrafo="' + i + '" aria-label="Escuchar este párrafo en miskito">🔊</button>' : '') + '</div>';
+      '<div class="botones-parrafo">' +
+      (p.miskito ? '<button class="pill chico" data-parrafo="' + i + '" aria-label="Escuchar este párrafo en miskito" title="Miskito">🔊</button>' : '') +
+      '<button class="pill chico azul" data-parrafoes="' + i + '" aria-label="Escuchar este párrafo en español" title="Español">🗣️</button></div></div>';
   }).join('');
   document.getElementById('panelDoc').scrollIntoView({behavior:'smooth', block:'start'});
 }
 document.getElementById('docParrafos').addEventListener('click', function(e){
-  var b = e.target.closest('[data-parrafo]'); if(!b || !docResultado) return;
+  var b = e.target.closest('[data-parrafo],[data-parrafoes]'); if(!b || !docResultado) return;
+  if(b.dataset.parrafoes !== undefined){
+    var k = +b.dataset.parrafoes;
+    decir(docResultado.parrafos[k].espanol, 'doces-' + k); return;
+  }
   var i = +b.dataset.parrafo;
   decir(paraVoz(docResultado.parrafos[i].miskito), 'doc-' + i);
 });
@@ -1459,7 +1940,7 @@ document.getElementById('archivoImportar').addEventListener('change', function(e
 });
 
 /* ---------- Contenido para imprimir y PDF ---------- */
-var ESTADO_TXT = {f:'fuente', r:'revisada', ia:'IA aproximada', v:'por verificar'};
+var ESTADO_TXT = {mep:'Material MEP', f:'fuente', r:'revisada', ia:'IA aproximada', v:'por verificar'};
 function contenidoFicha(seccion){
   var titulo, lineas = [];
   if(seccion === 'traducir'){

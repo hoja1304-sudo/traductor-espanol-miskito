@@ -98,6 +98,24 @@ td.mi{font-weight:700;color:var(--mar)}
 [data-theme="dark"] td.mi{color:#7fd8e3}
 td .pill{min-height:44px;padding:4px 12px}
 
+/* Imágenes (tablero de comunicación) */
+.grupo-img{margin:18px 0 8px;font-size:1.15rem}
+.tablero{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
+.picto{background:var(--panel);border:1px solid var(--line);border-radius:20px;overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--sombra)}
+.picto .dibujo{border:none;padding:10px;cursor:pointer;background:#fdf6e9;display:block;width:100%}
+[data-theme="dark"] .picto .dibujo{background:#f3ead8}
+.picto .dibujo svg{width:100%;height:auto;max-height:150px;display:block}
+.picto .info{padding:10px 14px 14px;display:flex;flex-direction:column;gap:4px}
+.picto .mi{font-size:1.6rem;font-weight:800;color:var(--mar);line-height:1.2}
+[data-theme="dark"] .picto .mi{color:#7fd8e3}
+.picto .mi.vacia{font-size:1rem;font-weight:400;font-style:italic;color:var(--muted)}
+.picto .pron{font-size:.95rem;color:var(--ink)}
+.picto .pron b{letter-spacing:.04em}
+.picto .es{font-size:1.02rem;font-weight:600}
+.picto .clave{font-size:.85rem;color:var(--muted)}
+.picto .acciones{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.picto .acciones .pill{min-height:44px;padding:6px 12px;font-size:14px}
+
 /* Documentos */
 .doc-archivo{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:12px;font-weight:600}
 .doc-archivo img{max-width:min(100%,320px);max-height:260px;border-radius:12px;border:1px solid var(--line)}
@@ -160,6 +178,7 @@ label{display:block;font-weight:600;margin:10px 0 4px}
     <button class="tarjeta-inicio" style="background:#0f7c8c" data-ir="traducir"><span class="ico">🎙️</span><b>Traducir</b><span>Habla o escribe en español y escucha la traducción.</span></button>
     <button class="tarjeta-inicio" style="background:#c4502a" data-ir="frases"><span class="ico">💬</span><b>Frases</b><span>Frases de todos los días, con voz grabada.</span></button>
     <button class="tarjeta-inicio" style="background:#23874f" data-ir="diccionario"><span class="ico">📖</span><b>Diccionario</b><span>Busca palabras en español o en miskito.</span></button>
+    <button class="tarjeta-inicio" style="background:#b45309" data-ir="imagenes"><span class="ico">🖼️</span><b>Imágenes</b><span>Dibujos de la vida diaria con su frase en miskito.</span></button>
     <button class="tarjeta-inicio" style="background:#2f62d9" data-ir="documentos"><span class="ico">📄</span><b>Documentos</b><span>Sube un documento o toma una foto de un texto para traducirlo.</span></button>
     <button class="tarjeta-inicio" style="background:#7d4cc4" data-ir="ajustes"><span class="ico">⚙️</span><b>Ajustes y fuentes</b><span>Inteligencia artificial y de dónde vienen las palabras.</span></button>
   </div>
@@ -240,6 +259,21 @@ label{display:block;font-weight:600;margin:10px 0 4px}
   <div class="fila">
     <button class="pill sec chico" data-imprimir="diccionario">🖨️ Imprimir</button>
     <button class="pill sec chico" data-pdf="diccionario">⬇️ Descargar PDF</button>
+  </div>
+</main>
+
+<!-- ============ IMÁGENES ============ -->
+<main id="imagenes" class="contenedor seccion oculto">
+  <div class="cabeza-seccion">
+    <button class="pill sec" data-ir="inicio">🏠 Inicio</button>
+    <h2>🖼️ Imágenes</h2>
+    <button class="pill sec chico" data-instr="imagenes">🔊 Escuchar instrucciones</button>
+  </div>
+  <p class="nota">Toca el dibujo para escucharlo en miskito. La <b>sílaba fuerte</b> va en mayúsculas. Una persona que hable miskito puede <b>corregir</b> la palabra por la frase completa y <b>grabar</b> su voz.</p>
+  <div id="tablero"></div>
+  <div class="fila">
+    <button class="pill sec chico" data-imprimir="imagenes">🖨️ Imprimir</button>
+    <button class="pill sec chico" data-pdf="imagenes">⬇️ Descargar PDF</button>
   </div>
 </main>
 
@@ -612,6 +646,7 @@ function escucharMiskito(id, texto){
 var INSTRUCCIONES = {
   traducir:'Toca el botón Hablar y di una frase en español. También puedes escribirla. Luego toca Traducir al miskito y después Escuchar en miskito.',
   documentos:'Toca Subir documento para elegir una foto, un PDF o un archivo de Word. También puedes tocar Tomar foto y fotografiar una página. Luego toca Traducir documento. Cada párrafo aparece en español y en miskito, con un botón para escucharlo.',
+  imagenes:'Mira los dibujos. Toca un dibujo para escuchar la palabra en miskito. Toca En español para escuchar la frase en español.',
   frases:'Elige un grupo de frases. Toca Escuchar para oír la frase en miskito. Una persona que hable miskito puede tocar Grabar para guardar su voz, o Corregir para arreglar la traducción.'
 };
 document.querySelectorAll('[data-instr]').forEach(function(b){
@@ -675,7 +710,7 @@ function alternarGrabacion(id, boton){
     grabador.onstop = function(){
       stream.getTracks().forEach(function(t){ t.stop(); });
       var blob = new Blob(trozos, {type: grabador.mimeType || 'audio/webm'});
-      guardarGrabacion(id, blob).then(pintarFrases);
+      guardarGrabacion(id, blob).then(seccionActual === 'imagenes' ? pintarImagenes : pintarFrases);
     };
     grabador.start();
     boton.classList.add('grabando'); boton.textContent = '⏹️ Detener';
@@ -692,6 +727,7 @@ function ir(id){
   if(id === 'frases') pintarFrases();
   if(id === 'diccionario') pintarDiccionario();
   if(id === 'ajustes') pintarClave();
+  if(id === 'imagenes') pintarImagenes();
 }
 document.addEventListener('click', function(e){
   var b = e.target.closest('[data-ir]');
@@ -758,7 +794,8 @@ document.getElementById('listaFrases').addEventListener('click', function(e){
     }).catch(function(err){ alert(err.message); b.disabled = false; b.textContent = '✨ Sugerir con IA'; });
   }
 });
-function abrirEditor(tarjeta, f){
+function abrirEditor(tarjeta, f, repintar){
+  repintar = repintar || pintarFrases;
   var acciones = tarjeta.querySelector('.acciones');
   acciones.innerHTML = '<div class="editor"><input type="text" value="'+esc(f.mi)+'" aria-label="Traducción en miskito">'+
     '<button class="pill verde" data-ok>Guardar</button><button class="pill sec" data-cancel>Cancelar</button></div>';
@@ -766,11 +803,168 @@ function abrirEditor(tarjeta, f){
   acciones.querySelector('[data-ok]').onclick = function(){
     var v = inp.value.trim();
     if(v){ correcciones[f.id] = {mi:v, estado:'r'}; } else { delete correcciones[f.id]; }
-    guardar('mq_correcciones', correcciones); pintarFrases();
+    guardar('mq_correcciones', correcciones); repintar();
   };
-  acciones.querySelector('[data-cancel]').onclick = pintarFrases;
+  acciones.querySelector('[data-cancel]').onclick = repintar;
   inp.addEventListener('keydown', function(e){ if(e.key === 'Enter') acciones.querySelector('[data-ok]').click(); });
 }
+
+/* ---------- Imágenes de la vida diaria ---------- */
+// Dibujos SVG propios (sin archivos externos)
+var T = 'stroke="#3a3a3a" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"';
+function svg(c){ return '<svg viewBox="0 0 160 120" aria-hidden="true">' + c + '</svg>'; }
+function corazon(x, y, s, color){
+  return '<path transform="translate(' + x + ' ' + y + ') scale(' + s + ')" d="M0 -6 C0 -16 -16 -16 -16 -4 C-16 6 0 14 0 20 C0 14 16 6 16 -4 C16 -16 0 -16 0 -6Z" fill="' + color + '" ' + T + '/>';
+}
+function cara(boca, extra){
+  return '<circle cx="80" cy="60" r="44" fill="#ffd54f" ' + T + '/><circle cx="64" cy="50" r="5" fill="#3a3a3a"/><circle cx="96" cy="50" r="5" fill="#3a3a3a"/>' +
+    '<path d="' + boca + '" fill="none" ' + T + ' stroke-width="5"/>' + (extra || '');
+}
+var DIBUJOS = {
+  bano: svg('<rect x="58" y="10" width="44" height="32" rx="6" fill="#bfe3ee" ' + T + '/><rect x="72" y="18" width="16" height="5" rx="2" fill="#3a3a3a"/>' +
+    '<rect x="42" y="44" width="76" height="11" rx="5" fill="#e6f4f8" ' + T + '/><path d="M46 55 H114 Q112 84 86 88 L90 110 H70 L74 88 Q48 84 46 55Z" fill="#fff" ' + T + '/>'),
+  agua: svg('<path d="M48 18 H112 L103 110 H57 Z" fill="#eaf6fb"/><path d="M53 50 H107 L103 110 H57 Z" fill="#5bb8de"/>' +
+    '<path d="M48 18 H112 L103 110 H57 Z" fill="none" ' + T + '/><path d="M134 28 Q146 46 134 54 Q122 46 134 28Z" fill="#5bb8de" ' + T + '/>'),
+  comer: svg('<ellipse cx="80" cy="64" rx="44" ry="40" fill="#fff" ' + T + '/><ellipse cx="80" cy="64" rx="30" ry="27" fill="#f7efe0" stroke="#c9b48f" stroke-width="2"/>' +
+    '<circle cx="70" cy="60" r="7" fill="#7a3e22"/><circle cx="78" cy="70" r="7" fill="#7a3e22"/><circle cx="66" cy="72" r="6" fill="#7a3e22"/>' +
+    '<ellipse cx="92" cy="60" rx="12" ry="9" fill="#fff" stroke="#c9b48f" stroke-width="2"/>' +
+    '<path d="M16 16 V36 Q16 46 22 46 Q28 46 28 36 V16 M22 16 V40 M22 46 V110" fill="none" ' + T + ' stroke-width="4"/>' +
+    '<ellipse cx="138" cy="30" rx="9" ry="14" fill="#ddd" ' + T + '/><path d="M138 44 V110" ' + T + ' stroke-width="5"/>'),
+  fruta: svg('<path d="M58 38 Q96 28 100 68 Q100 104 64 102 Q32 98 34 68 Q36 44 58 38Z" fill="#f6a623" ' + T + '/><ellipse cx="80" cy="60" rx="10" ry="14" fill="#e8742a" opacity=".6"/>' +
+    '<path d="M62 38 Q70 16 92 20 Q84 38 62 38Z" fill="#4caf50" ' + T + '/><path d="M104 98 Q140 92 144 48 Q150 42 154 50 Q154 106 104 106Z" fill="#ffe066" ' + T + '/>'),
+  dormir: svg('<rect x="14" y="48" width="12" height="62" rx="3" fill="#a0522d" ' + T + '/><rect x="134" y="66" width="12" height="44" rx="3" fill="#a0522d" ' + T + '/>' +
+    '<rect x="20" y="70" width="120" height="22" rx="4" fill="#9fc5e8" ' + T + '/><rect x="30" y="54" width="32" height="18" rx="9" fill="#fff" ' + T + '/>' +
+    '<rect x="58" y="60" width="78" height="16" rx="7" fill="#6fa8dc" ' + T + '/>' +
+    '<text x="100" y="40" font-family="Arial" font-weight="900" font-size="24" fill="#3d5a99">Z</text><text x="122" y="24" font-family="Arial" font-weight="900" font-size="17" fill="#3d5a99">z</text>'),
+  lavar: svg('<path d="M34 30 H98 Q112 30 112 44 V54 H98 V44 H34 Z" fill="#c0c7cf" ' + T + '/><rect x="52" y="16" width="18" height="14" rx="3" fill="#9aa4ad" ' + T + '/>' +
+    '<path d="M105 62 q6 9 0 13 q-6 -4 0 -13z M105 80 q6 9 0 13 q-6 -4 0 -13z" fill="#5bb8de"/>' +
+    '<path d="M30 96 H146 Q140 118 88 118 Q36 118 30 96Z" fill="#eaf6fb" ' + T + '/>' +
+    '<circle cx="54" cy="84" r="7" fill="#fff" stroke="#9fd3e6" stroke-width="2"/><circle cx="66" cy="74" r="5" fill="#fff" stroke="#9fd3e6" stroke-width="2"/><circle cx="130" cy="80" r="6" fill="#fff" stroke="#9fd3e6" stroke-width="2"/>'),
+  ayuda: svg('<circle cx="64" cy="40" r="14" fill="#c98b5c" ' + T + '/><path d="M46 112 V76 Q46 58 64 58 Q82 58 82 76 V112Z" fill="#5c8de0" ' + T + '/>' +
+    '<path d="M78 66 L98 32" stroke="#5c8de0" stroke-width="10" stroke-linecap="round"/><circle cx="99" cy="28" r="7" fill="#c98b5c" ' + T + '/>' +
+    '<circle cx="128" cy="40" r="20" fill="#ffd54f" ' + T + '/><text x="128" y="51" font-family="Arial" font-weight="900" font-size="30" text-anchor="middle" fill="#3a3a3a">!</text>'),
+  cabeza: svg('<circle cx="80" cy="64" r="36" fill="#c98b5c" ' + T + '/><path d="M44 60 Q46 26 80 26 Q114 26 116 60 Q104 40 80 42 Q56 40 44 60Z" fill="#3b2a20"/>' +
+    '<path d="M62 66 q6 4 12 0 M86 66 q6 4 12 0 M70 86 q10 -6 20 0" fill="none" ' + T + '/>' +
+    '<path d="M20 34 l10 6 -8 5 12 7 M140 34 l-10 6 8 5 -12 7" fill="none" stroke="#e53935" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>'),
+  estomago: svg('<path d="M48 18 Q80 8 112 18 L120 112 H40 Z" fill="#7cc4a4" ' + T + '/>' +
+    '<path d="M80 64 a4 4 0 1 1 8 0 a8 8 0 1 1 -16 0 a12 12 0 1 1 24 0 a16 16 0 1 1 -32 0" fill="none" stroke="#e53935" stroke-width="4" stroke-linecap="round"/>' +
+    '<path d="M20 50 l10 6 -8 5 12 7 M140 50 l-10 6 8 5 -12 7" fill="none" stroke="#e53935" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>'),
+  feliz: svg(cara('M58 72 Q80 96 102 72')),
+  triste: svg(cara('M60 88 Q80 70 100 88', '<path d="M64 60 q5 9 0 13 q-5 -4 0 -13z" fill="#5bb8de"/>')),
+  mama: svg('<path d="M40 42 Q40 16 62 16 Q84 16 84 42 V66 H40Z" fill="#3b2a20"/><circle cx="62" cy="40" r="15" fill="#c98b5c" ' + T + '/>' +
+    '<path d="M62 58 L34 112 H90 Z" fill="#e57373" ' + T + '/>' + corazon(122, 52, 1.2, '#e53935')),
+  papa: svg('<circle cx="70" cy="34" r="16" fill="#c98b5c" ' + T + '/><path d="M54 30 Q55 14 70 14 Q85 14 86 30 Q78 21 70 21 Q62 21 54 30Z" fill="#3b2a20"/>' +
+    '<path d="M44 112 V66 Q44 54 70 54 Q96 54 96 66 V112Z" fill="#4f9d69" ' + T + '/>' + corazon(128, 52, 1.1, '#e53935')),
+  casa: svg('<path d="M44 92 V114 M80 92 V114 M116 92 V114" ' + T + ' stroke-width="5"/><rect x="36" y="52" width="88" height="40" fill="#f3d9a4" ' + T + '/>' +
+    '<path d="M24 54 L80 14 L136 54Z" fill="#c4502a" ' + T + '/><rect x="72" y="64" width="18" height="28" fill="#8d5a33" ' + T + '/>' +
+    '<rect x="46" y="62" width="16" height="14" fill="#9fd3e6" ' + T + '/><rect x="100" y="62" width="16" height="14" fill="#9fd3e6" ' + T + '/>'),
+  escuela: svg('<rect x="22" y="50" width="116" height="60" fill="#f6e3b4" ' + T + '/><path d="M14 52 L80 18 L146 52Z" fill="#2f62d9" ' + T + '/>' +
+    '<circle cx="80" cy="40" r="7" fill="#e0a21b" ' + T + '/><rect x="70" y="80" width="20" height="30" fill="#8d5a33" ' + T + '/>' +
+    '<rect x="32" y="62" width="18" height="16" fill="#9fd3e6" ' + T + '/><rect x="110" y="62" width="18" height="16" fill="#9fd3e6" ' + T + '/>' +
+    '<rect x="32" y="86" width="18" height="16" fill="#9fd3e6" ' + T + '/><rect x="110" y="86" width="18" height="16" fill="#9fd3e6" ' + T + '/>'),
+  libro: svg('<path d="M12 30 V106 Q56 100 80 112 Q104 100 148 106 V30" fill="#2f62d9" ' + T + '/>' +
+    '<path d="M80 32 Q56 20 20 26 V98 Q56 92 80 104Z" fill="#fff" ' + T + '/><path d="M80 32 Q104 20 140 26 V98 Q104 92 80 104Z" fill="#fff" ' + T + '/>' +
+    '<path d="M30 42 H68 M30 54 H68 M30 66 H62 M92 42 H130 M92 54 H130 M92 66 H124" stroke="#9aa4ad" stroke-width="3" stroke-linecap="round"/>'),
+  jugar: svg('<circle cx="80" cy="62" r="44" fill="#ffd54f" ' + T + '/><path d="M80 18 Q52 62 80 106" fill="none" stroke="#e53935" stroke-width="9"/>' +
+    '<path d="M80 18 Q108 62 80 106" fill="none" stroke="#2f62d9" stroke-width="9"/><circle cx="80" cy="62" r="44" fill="none" ' + T + '/>' +
+    '<path d="M18 112 H142" stroke="#4caf50" stroke-width="6" stroke-linecap="round"/>'),
+  hola: svg('<path d="M24 22 H136 Q146 22 146 32 V76 Q146 86 136 86 H72 L50 108 L54 86 H24 Q14 86 14 76 V32 Q14 22 24 22Z" fill="#fff" ' + T + '/>' +
+    '<text x="80" y="64" font-family="Arial" font-weight="800" font-size="28" text-anchor="middle" fill="#0f7c8c">Naksa!</text>'),
+  gracias: svg(corazon(80, 56, 3, '#e53935') + '<path d="M28 24 l4 10 10 4 -10 4 -4 10 -4 -10 -10 -4 10 -4z M132 20 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3z" fill="#e0a21b"/>'),
+  si: svg('<circle cx="80" cy="60" r="46" fill="#23874f"/><path d="M56 62 L74 80 L106 42" fill="none" stroke="#fff" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>'),
+  no: svg('<circle cx="80" cy="60" r="46" fill="#c62828"/><path d="M60 40 L100 80 M100 40 L60 80" stroke="#fff" stroke-width="13" stroke-linecap="round"/>')
+};
+
+// es: frase en español · clave: palabra en español · mi: palabra en miskito · pr: pronunciación (sílaba fuerte en mayúsculas)
+var IMAGENES = [
+  {g:'Lo que necesito', items:[
+    {id:'bano', es:'Necesito ir al baño', clave:'Baño', mi:'', pr:'', estado:''},
+    {id:'agua', es:'Tengo sed, quiero agua', clave:'Agua', mi:'Li', pr:'LI', estado:'f'},
+    {id:'comer', es:'Tengo hambre, quiero comer', clave:'Comida', mi:'Plun', pr:'PLUN', estado:'f'},
+    {id:'fruta', es:'Quiero una fruta', clave:'Fruta', mi:'Ma', pr:'MA', estado:'f'},
+    {id:'dormir', es:'Tengo sueño, quiero dormir', clave:'Dormir', mi:'Yapaia', pr:'YA-pa-ia', estado:'f'},
+    {id:'lavar', es:'Me lavo las manos', clave:'Mano', mi:'Mihta', pr:'MIH-ta', estado:'f'},
+    {id:'ayuda', es:'Necesito ayuda', clave:'Ayuda', mi:'Hilp', pr:'JILP', estado:'f'}
+  ]},
+  {g:'Me duele', items:[
+    {id:'cabeza', es:'Me duele la cabeza', clave:'Cabeza', mi:'Lal', pr:'LAL', estado:'f'},
+    {id:'estomago', es:'Me duele el estómago', clave:'Estómago', mi:'Klunghka', pr:'KLUNG-ka', estado:'f'}
+  ]},
+  {g:'Cómo me siento', items:[
+    {id:'feliz', es:'Estoy feliz', clave:'Feliz', mi:'', pr:'', estado:''},
+    {id:'triste', es:'Estoy triste', clave:'Triste', mi:'', pr:'', estado:''}
+  ]},
+  {g:'Mi familia y mis lugares', items:[
+    {id:'mama', es:'Quiero a mi mamá', clave:'Mamá', mi:'Yapti', pr:'YAP-ti', estado:'f'},
+    {id:'papa', es:'Mi papá', clave:'Papá', mi:'Aisa', pr:'AI-sa', estado:'f'},
+    {id:'casa', es:'Quiero ir a mi casa', clave:'Casa', mi:'Utla', pr:'UT-la', estado:'f'},
+    {id:'escuela', es:'Vamos a la escuela', clave:'Escuela', mi:'Skul', pr:'ES-kul', estado:'f'}
+  ]},
+  {g:'En la escuela', items:[
+    {id:'libro', es:'Vamos a leer un libro', clave:'Libro', mi:'Buk', pr:'BUK', estado:'f'},
+    {id:'jugar', es:'Vamos a jugar', clave:'Jugar', mi:'Pulaia', pr:'PU-la-ia', estado:'f'}
+  ]},
+  {g:'Para responder', items:[
+    {id:'hola', es:'Hola', clave:'Hola', mi:'Naksa', pr:'NAK-sa', estado:'f'},
+    {id:'gracias', es:'Gracias', clave:'Gracias', mi:'Tingki', pr:'TING-ki', estado:'v'},
+    {id:'si', es:'Sí', clave:'Sí', mi:'Au', pr:'AU', estado:'f'},
+    {id:'no', es:'No', clave:'No', mi:'Apia', pr:'A-pia', estado:'f'}
+  ]}
+];
+// Aplica las correcciones guardadas (una frase completa reemplaza la palabra)
+function imagenesActuales(){
+  var lista = [];
+  IMAGENES.forEach(function(g){
+    g.items.forEach(function(im){
+      var id = 'img_' + im.id, cor = correcciones[id];
+      lista.push({id:id, dib:im.id, g:g.g, es:im.es, clave:im.clave,
+        mi: cor ? cor.mi : im.mi, pr: cor ? '' : im.pr, estado: cor ? cor.estado : im.estado, frase: !!cor});
+    });
+  });
+  return lista;
+}
+function pintarImagenes(){
+  var lista = imagenesActuales();
+  listarGrabadas().then(function(grabadas){
+    document.getElementById('tablero').innerHTML = IMAGENES.map(function(g){
+      return '<h3 class="grupo-img">' + esc(g.g) + '</h3><div class="tablero">' +
+        lista.filter(function(im){ return im.g === g.g; }).map(function(im){
+          var tiene = grabadas.indexOf(im.id) >= 0;
+          return '<div class="picto" data-id="' + im.id + '">' +
+            '<button class="dibujo" data-acc="oir" aria-label="Escuchar en miskito: ' + esc(im.es) + '">' + DIBUJOS[im.dib] + '</button>' +
+            '<div class="info">' +
+              (im.mi ? '<div class="mi">' + esc(im.mi) + '</div>' : '<div class="mi vacia">Falta la palabra en miskito</div>') +
+              (im.pr ? '<div class="pron">Se dice: <b>' + esc(im.pr) + '</b></div>' : '') +
+              '<div class="es">' + esc(im.es) + '</div>' +
+              '<div class="clave">' + (im.mi && !im.frase ? esc(im.clave) + ' = ' + esc(im.mi) + ' · ' : '') + chipEstado(im.mi ? im.estado : '') +
+                (tiene ? ' <span class="chip ok">🎙️ Voz grabada</span>' : '') + '</div>' +
+              '<div class="acciones">' +
+                '<button class="pill azul" data-acc="es">🗣️ En español</button>' +
+                (!im.mi ? '<button class="pill morado" data-acc="ia">✨ Sugerir con IA</button>' : '') +
+                '<button class="pill sec" data-acc="editar">✏️ Corregir</button>' +
+                '<button class="pill coral" data-acc="grabar">🎙️ Grabar</button>' +
+              '</div></div></div>';
+        }).join('') + '</div>';
+    }).join('');
+  });
+}
+document.getElementById('tablero').addEventListener('click', function(e){
+  var b = e.target.closest('[data-acc]'); if(!b) return;
+  var tarjeta = b.closest('.picto'), id = tarjeta.dataset.id;
+  var im = imagenesActuales().find(function(x){ return x.id === id; });
+  var acc = b.dataset.acc;
+  if(acc === 'oir'){ if(im.mi) escucharMiskito(id, im.mi); else decir(im.es, 'es-' + id); }
+  if(acc === 'es') decir(im.es, 'es-' + id);
+  if(acc === 'grabar') alternarGrabacion(id, b);
+  if(acc === 'editar') abrirEditor(tarjeta, im, pintarImagenes);
+  if(acc === 'ia'){
+    if(!claveApi()){ alert('Para sugerir con IA, primero guarda una clave en «Ajustes y fuentes».'); return; }
+    b.disabled = true; b.textContent = '⏳ Pensando…';
+    traducirIA(im.es).then(function(r){
+      correcciones[id] = {mi:r.miskito, estado:'ia'}; guardar('mq_correcciones', correcciones); pintarImagenes();
+    }).catch(function(err){ alert(err.message); b.disabled = false; b.textContent = '✨ Sugerir con IA'; });
+  }
+});
 
 /* ---------- Diccionario ---------- */
 function pintarDiccionario(){
@@ -1266,6 +1460,12 @@ function contenidoFicha(seccion){
       lineas.push('Estado: ' + (ESTADO_TXT[docResultado.estado] || ''));
       if(docResultado.notas) lineas.push(docResultado.notas);
     }
+  } else if(seccion === 'imagenes'){
+    titulo = 'Imágenes de la vida diaria en miskito';
+    imagenesActuales().forEach(function(im){
+      lineas.push(im.es + '  —  ' + (im.mi ? im.mi + (im.pr ? '  [' + im.pr + ']' : '') : '_______________') +
+        (im.mi && im.estado !== 'f' ? '  (' + ESTADO_TXT[im.estado] + ')' : ''));
+    });
   } else if(seccion === 'frases'){
     var cat = categoriasVisibles().find(function(c){ return c.id === catActual; });
     titulo = 'Frases: ' + (cat ? cat.nombre : '');
